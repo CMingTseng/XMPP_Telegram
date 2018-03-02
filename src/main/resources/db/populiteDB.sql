@@ -1,1 +1,0 @@
-INSERT INTO xmpp_accounts (login, password, server) VALUES ();

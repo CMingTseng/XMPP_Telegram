@@ -1,5 +1,9 @@
 package XMPP_Telegram;
 
+import XMPP_Telegram.model.XMPPAccount;
+import XMPP_Telegram.repository.XMPPAccountRepository;
+import XMPP_Telegram.service.XMPPAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

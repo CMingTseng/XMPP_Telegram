@@ -28,11 +28,14 @@
         <!--MySQL-->
         <mysql.version>8.0.8-dmr</mysql.version>
 
-        <!-- Logging -->
+        <!--Logging-->
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.7.25</slf4j.version>
 
-        <!--    Tests  -->
+        <!--XMPP-->
+        <smack.version>4.2.3</smack.version>
+
+        <!--Tests  -->
         <junit.version>4.12</junit.version>
 	</properties>
 
@@ -81,6 +84,7 @@
 			<scope>test</scope>
 		</dependency>
 
+
         <!--Logging with SLF4J & LogBack-->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -126,6 +130,33 @@
             <version>${mysql.version}</version>
         </dependency>
 
+        <!--XMPP-->
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-core</artifactId>
+            <version>${smack.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-im</artifactId>
+            <version>${smack.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-extensions</artifactId>
+            <version>${smack.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-java7</artifactId>
+            <version>${smack.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack-tcp</artifactId>
+            <version>${smack.version}</version>
+        </dependency>
+
         <!--Test-->
         <dependency>
             <groupId>junit</groupId>
@@ -144,7 +175,7 @@
             <version>3.8.0</version>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>

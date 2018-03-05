@@ -1,13 +1,13 @@
 package XMPP_Telegram.model;
 
 
-import org.jivesoftware.smack.SmackException;
+import XMPP_Telegram.controller.XMPPController;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
-import org.jxmpp.stringprep.XmppStringprepException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PreDestroy;
 
@@ -24,6 +24,9 @@ public class XMPPAccount{
     private XMPPConnection connection;
 
     private ChatManager chatManager;
+
+    @Autowired
+    private XMPPController controller;
 
     public XMPPAccount() {
         connection = new XMPPConnection(this);
@@ -45,14 +48,14 @@ public class XMPPAccount{
         connection = new XMPPConnection(this);
     }
 
-    public void Connect() {
+    public void connect() {
         try {
             connection.createConnection();
             chatManager = ChatManager.getInstanceFor(connection.getConnection());
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    System.out.println(message.getBody());
+
                 }
             });
         } catch (Exception e) {
@@ -61,12 +64,12 @@ public class XMPPAccount{
     }
 
     @PreDestroy
-    public void Disconnect() {
+    public void disconnect() {
         connection.close();
     }
 
 
-    public boolean isActive() {
+    protected boolean isActive() {
         return connection.getConnection().isConnected();
     }
 
@@ -100,6 +103,10 @@ public class XMPPAccount{
 
     public String getPassword() {
         return password;
+    }
+
+    public void setController(XMPPController controller) {
+        this.controller = controller;
     }
 
     @Override

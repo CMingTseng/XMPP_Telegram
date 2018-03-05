@@ -41,7 +41,7 @@ public class XMPPConnection {
     private void connect() throws Exception { //создаем подключение к серверу XMPP. Если соединение не удалось - пробрысываем исключение
         if (configuration != null) {
             connection = new XMPPTCPConnection(configuration);
-        }else {
+        } else {
             configure();
             connection = new XMPPTCPConnection(configuration);
         }
@@ -68,7 +68,6 @@ public class XMPPConnection {
 
     public void close() {
         connection.disconnect();
-        Thread.currentThread().interrupt();
     }
 
     public AbstractXMPPConnection getConnection() {
@@ -96,7 +95,8 @@ public class XMPPConnection {
                 //System.out.println("checkClientTrusted : " + authType);
             }
         }};
-        protected SSLContext getSslContext()  {
+
+        protected SSLContext getSslContext() {
             //создаем настройки для работы с TLS
             SSLContext sslContext = null;
             try {
@@ -111,7 +111,6 @@ public class XMPPConnection {
         protected HostnameVerifier getHostNameVerifier() {
             //Создаем настройки для проверки хоста
             return new XmppHostnameVerifier();
-//            return (s, sslSession) -> s.equals(sslSession.getPeerHost());
         }
     }
 }

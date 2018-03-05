@@ -10,8 +10,11 @@ import org.jxmpp.jid.EntityBareJid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PreDestroy;
+import java.util.Date;
 
 public class XMPPAccount{
+
+    private int id;
 
     private String server;
 
@@ -20,6 +23,8 @@ public class XMPPAccount{
     private String password;
 
     private int port;
+
+    private boolean saveHistory;
 
     private XMPPConnection connection;
 
@@ -52,10 +57,18 @@ public class XMPPAccount{
         try {
             connection.createConnection();
             chatManager = ChatManager.getInstanceFor(connection.getConnection());
+            System.out.println(toString());
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-
+                    TransferMessage transferMessage = new TransferMessage();
+                    transferMessage.setAccount(XMPPAccount.this);
+                    transferMessage.setDate(new Date());
+                    transferMessage.setContact(from.asEntityBareJid().toString());
+                    transferMessage.setFromXMPP(true);
+                    transferMessage.setText(message.getBody());
+                    transferMessage.setSent(false);
+                    controller.saveMessage(transferMessage);
                 }
             });
         } catch (Exception e) {
@@ -109,6 +122,22 @@ public class XMPPAccount{
         this.controller = controller;
     }
 
+    public boolean isSaveHistory() {
+        return saveHistory;
+    }
+
+    public void setSaveHistory(boolean saveHistory) {
+        this.saveHistory = saveHistory;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "XMPPAccount{" +
@@ -116,6 +145,7 @@ public class XMPPAccount{
                 ", login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", port=" + port +
+                ", saveHistory=" + saveHistory +
                 '}';
     }
 }

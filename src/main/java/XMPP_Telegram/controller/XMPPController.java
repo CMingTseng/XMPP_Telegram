@@ -1,5 +1,6 @@
 package XMPP_Telegram.controller;
 
+import XMPP_Telegram.model.TransferMessage;
 import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.service.MessageService;
 import XMPP_Telegram.service.XMPPAccountService;
@@ -33,6 +34,10 @@ public class XMPPController {
 
     public void connectAccount (XMPPAccount account) {
         account.connect();
+    }
+
+    public void saveMessage (TransferMessage message) {
+
     }
 
     public XMPPAccountService getAccountService() {

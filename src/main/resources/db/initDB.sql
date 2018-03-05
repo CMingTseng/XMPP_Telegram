@@ -8,6 +8,7 @@ CREATE TABLE xmpp_accounts
   `password` VARCHAR(250) NOT NULL,
   `server` VARCHAR(250) NOT NULL,
   `port` INT DEFAULT 5222,
+  `savehistory` TINYINT(1) DEFAULT 1 NOT NULL,
   PRIMARY KEY (`id`)
 );
 CREATE UNIQUE INDEX xmpp_accounts_login_server_index ON xmpp_accounts (login,server);

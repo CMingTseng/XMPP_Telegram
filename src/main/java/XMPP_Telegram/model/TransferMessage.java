@@ -86,4 +86,17 @@ public class TransferMessage {
     public void setSent(boolean sent) {
         this.sent = sent;
     }
+
+    @Override
+    public String toString() {
+        return "TransferMessage{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", account=" + account +
+                ", contact='" + contact + '\'' +
+                ", fromXMPP=" + fromXMPP +
+                ", sent=" + sent +
+                ", date=" + date +
+                '}';
+    }
 }

@@ -4,21 +4,13 @@ import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.repository.XMPPAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 
 @Repository
@@ -27,17 +19,9 @@ public class MySQLXMPPAccountRepositoryImpl implements XMPPAccountRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    private final SimpleJdbcInsert insertXMPPAccount;
-
     @Autowired
-    public MySQLXMPPAccountRepositoryImpl(@Qualifier("dataSource") DataSource dataSource, JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.insertXMPPAccount = new SimpleJdbcInsert(dataSource)
-                .withTableName("xmpp_accounts")
-                .usingGeneratedKeyColumns("id");
+    public MySQLXMPPAccountRepositoryImpl(@Qualifier("dataSource") DataSource dataSource, JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
 
@@ -48,7 +32,8 @@ public class MySQLXMPPAccountRepositoryImpl implements XMPPAccountRepository {
 
     @Override
     public XMPPAccount get(String server, String login) {
-        return jdbcTemplate.queryForObject("SELECT * FROM xmpp_accounts WHERE server= ?  AND login = ?", ROW_MAPPER, server, login);
+
+        return jdbcTemplate.queryForObject("SELECT * FROM xmpp_accounts WHERE server= ? AND login = ? LIMIT 1", ROW_MAPPER, server, login);
     }
 
     @Override

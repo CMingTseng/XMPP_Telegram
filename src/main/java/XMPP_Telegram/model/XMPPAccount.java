@@ -2,17 +2,19 @@ package XMPP_Telegram.model;
 
 
 import XMPP_Telegram.controller.XMPPController;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.packet.EmptyResultIQ;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PreDestroy;
-import java.util.Date;
 
-public class XMPPAccount{
+
+public class XMPPAccount {
 
     private int id;
 
@@ -26,11 +28,12 @@ public class XMPPAccount{
 
     private boolean saveHistory;
 
+    private boolean active;
+
     private XMPPConnection connection;
 
     private ChatManager chatManager;
 
-    @Autowired
     private XMPPController controller;
 
     public XMPPAccount() {
@@ -57,21 +60,26 @@ public class XMPPAccount{
         try {
             connection.createConnection();
             chatManager = ChatManager.getInstanceFor(connection.getConnection());
-            System.out.println(toString());
             chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-                    TransferMessage transferMessage = new TransferMessage();
-                    transferMessage.setAccount(XMPPAccount.this);
-                    transferMessage.setDate(new Date());
-                    transferMessage.setContact(from.asEntityBareJid().toString());
-                    transferMessage.setFromXMPP(true);
-                    transferMessage.setText(message.getBody());
-                    transferMessage.setSent(false);
-                    controller.saveMessage(transferMessage);
+                    if (message.getType().equals(Message.Type.chat)) {
+                        controller.saveMessage(new TransferMessage(message, XMPPAccount.this));
+                        try {
+                            IQ iq = new EmptyResultIQ();
+                            iq.setType(IQ.Type.result);
+                            iq.setStanzaId(message.getStanzaId());
+                            iq.setTo(from);
+                            connection.getConnection().sendStanza(iq);
+                        } catch (SmackException.NotConnectedException | InterruptedException e) {
+                            //TODO
+                            e.printStackTrace();
+                        }
+                    }
                 }
             });
         } catch (Exception e) {
+            //TODO
             e.printStackTrace();
         }
     }
@@ -82,8 +90,12 @@ public class XMPPAccount{
     }
 
 
-    protected boolean isActive() {
+    public boolean isAlive() {
         return connection.getConnection().isConnected();
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public void setServer(String server) {
@@ -136,6 +148,10 @@ public class XMPPAccount{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override

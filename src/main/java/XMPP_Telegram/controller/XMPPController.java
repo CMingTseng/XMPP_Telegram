@@ -24,7 +24,9 @@ public class XMPPController {
     public void start() {
         accounts = accountService.getAll();
         for (XMPPAccount account : accounts) {
-            account.connect();
+            account.setController(this);
+            if (account.isActive())
+                account.connect();
         }
     }
 
@@ -37,6 +39,7 @@ public class XMPPController {
     }
 
     public void saveMessage (TransferMessage message) {
+        messageService.create(message);
 
     }
 

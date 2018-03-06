@@ -46,7 +46,7 @@ public class MySQLMessageRepositoryImpl implements MessageRepository {
 
     @Override
     public void create(TransferMessage message) {
-        jdbcTemplate.update("INSERT INTO messages (text, xmppaccount, contact, fromXMPP, isSent, date) VALUES (?, ?, ?, ?, ?, ?)", message.getText(), accountRepository.get(message.getAccount().getLogin(), message.getAccount().getServer()).getId(), message.getContact(), message.isFromXMPP(), message.isSent(), message.getDate());
+        jdbcTemplate.update("INSERT INTO messages (text, xmppaccount, contact, fromXMPP, isSent, date) VALUES (?, ?, ?, ?, ?, ?)", message.getText(), accountRepository.get(message.getAccount().getServer(),message.getAccount().getLogin()).getId(), message.getContact(), message.isFromXMPP(), message.isSent(), message.getDate());
     }
 
     @Override

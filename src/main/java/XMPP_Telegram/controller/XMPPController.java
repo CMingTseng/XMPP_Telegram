@@ -30,6 +30,12 @@ public class XMPPController {
         }
     }
 
+    public void stop() {
+        for (XMPPAccount account : accounts) {
+            account.disconnect();
+        }
+    }
+
     public void disconnectAccount(XMPPAccount account) {
         account.disconnect();
     }

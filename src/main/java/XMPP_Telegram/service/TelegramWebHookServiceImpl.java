@@ -23,7 +23,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 @Service
 public class TelegramWebHookServiceImpl extends TelegramWebHookService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBotService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
 
     @Autowired

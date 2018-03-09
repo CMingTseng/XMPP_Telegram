@@ -1,11 +1,11 @@
 package XMPP_Telegram.telegrambot.impl;
 
-import com.github.unafraid.spring.bot.handlers.general.inline.AbstractCommandData;
-import com.github.unafraid.spring.bot.handlers.general.inline.AbstractInlineMenu;
-import com.github.unafraid.spring.bot.handlers.general.inline.IInlineCommandType;
-import com.github.unafraid.spring.bot.util.BotUtil;
-import com.github.unafraid.spring.model.User;
-import com.github.unafraid.spring.services.UsersService;
+import XMPP_Telegram.model.TelegramUser;
+import XMPP_Telegram.service.TelegramUserService;
+import XMPP_Telegram.telegrambot.BotUtil;
+import XMPP_Telegram.telegrambot.general.inline.AbstractCommandData;
+import XMPP_Telegram.telegrambot.general.inline.AbstractInlineMenu;
+import XMPP_Telegram.telegrambot.general.inline.IInlineCommandType;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
     @Inject
-    private UsersService usersService;
+    private TelegramUserService usersService;
 
     @Override
     public String getCommand() {
@@ -75,7 +75,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                     return true;
                 }
                 case 1: {
-                    final User userToEdit = usersService.findByName(query.getData());
+                    final TelegramUser userToEdit = usersService.findByName(query.getData());
                     if (userToEdit == null) {
                         return false;
                     }
@@ -99,7 +99,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                         return true;
                     }
 
-                    final User userToDelete = usersService.findByName(query.getData());
+                    final TelegramUser userToDelete = usersService.findByName(query.getData());
                     if (userToDelete != null) {
                         if (usersService.delete(userToDelete.getId()) != null) {
                             BotUtil.editMessage(bot, query.getMessage(), "User " + userToDelete.getName() + " has been deleted", false, null);
@@ -124,7 +124,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                         back(bot, query.getMessage(), data);
                         return true;
                     }
-                    final User user = usersService.findByName(query.getData());
+                    final TelegramUser user = usersService.findByName(query.getData());
                     final AnswerCallbackQuery answer = new AnswerCallbackQuery();
                     answer.setText(user != null ? "User: [" + user.getId() + "](" + user.getName() + ") Level: " + user.getLevel() : "U've clicked at " + query.getData());
                     answer.setCallbackQueryId(query.getId());
@@ -219,7 +219,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                     final String text = message.getText();
                     final int level = BotUtil.parseInt(text, 0);
                     if (level > 0) {
-                        final User creator = usersService.findById(message.getFrom().getId());
+                        final TelegramUser creator = usersService.findById(message.getFrom().getId());
                         if (creator == null) {
                             return false; // Shouldn't happen like ever..
                         }
@@ -229,7 +229,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                             return true;
                         }
 
-                        final User user = usersService.create(data.getId(), data.getName(), level);
+                        final TelegramUser user = usersService.create(data.getId(), data.getName(), level);
                         if (user != null) {
                             BotUtil.sendMessage(bot, message, "User created", false, false, null);
                         } else {
@@ -260,7 +260,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
                 case 3: {
                     final int level = BotUtil.parseInt(message.getText(), 0);
                     if (level > 0) {
-                        final User creator = usersService.findById(message.getFrom().getId());
+                        final TelegramUser creator = usersService.findById(message.getFrom().getId());
                         if (creator == null) {
                             return false; // Shouldn't happen like ever..
                         }
@@ -291,7 +291,7 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
     static class UserData extends AbstractCommandData {
         private int _id;
         private String _name;
-        private User _user;
+        private TelegramUser _user;
 
         UserData(int ownerId) {
             super(ownerId);
@@ -313,11 +313,11 @@ public class UsersHandler extends AbstractInlineMenu<UsersHandler.UserData> {
             _name = name;
         }
 
-        void setUser(User user) {
+        void setUser(TelegramUser user) {
             _user = user;
         }
 
-        User getUser() {
+        TelegramUser getUser() {
             return _user;
         }
     }

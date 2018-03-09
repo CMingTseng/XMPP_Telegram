@@ -1,6 +1,6 @@
 package XMPP_Telegram.telegrambot.general;
 
-import com.github.unafraid.spring.services.UsersService;
+import XMPP_Telegram.service.TelegramUserService;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +29,7 @@ public final class CommandHandler {
         return _handlers.values();
     }
 
-    public <T> List<T> getHandlers(Class<T> clazz, int id, UsersService usersService) {
+    public <T> List<T> getHandlers(Class<T> clazz, int id, TelegramUserService usersService) {
         return _handlers.values().stream()
                 .filter(clazz::isInstance)
                 .map(clazz::cast)

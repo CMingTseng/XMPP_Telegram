@@ -1,7 +1,7 @@
 package XMPP_Telegram.telegrambot.general.inline;
 
-import com.github.unafraid.spring.bot.handlers.general.*;
-import com.github.unafraid.spring.bot.util.BotUtil;
+import XMPP_Telegram.telegrambot.BotUtil;
+import XMPP_Telegram.telegrambot.general.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.api.objects.CallbackQuery;

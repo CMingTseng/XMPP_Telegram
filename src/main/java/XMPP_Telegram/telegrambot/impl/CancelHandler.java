@@ -1,9 +1,9 @@
 package XMPP_Telegram.telegrambot.impl;
 
-import com.github.unafraid.spring.bot.handlers.general.CommandHandler;
-import com.github.unafraid.spring.bot.handlers.general.ICancelHandler;
-import com.github.unafraid.spring.bot.handlers.general.ICommandHandler;
-import com.github.unafraid.spring.services.UsersService;
+import XMPP_Telegram.service.TelegramUserService;
+import XMPP_Telegram.telegrambot.general.CommandHandler;
+import XMPP_Telegram.telegrambot.general.ICancelHandler;
+import XMPP_Telegram.telegrambot.general.ICommandHandler;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CancelHandler implements ICommandHandler {
 
     @Inject
-    private UsersService usersService;
+    private TelegramUserService usersService;
 
     @Override
     public String getCommand() {

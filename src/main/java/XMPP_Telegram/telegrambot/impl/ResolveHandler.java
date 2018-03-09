@@ -1,7 +1,7 @@
 package XMPP_Telegram.telegrambot.impl;
 
-import com.github.unafraid.spring.bot.handlers.general.ICommandHandler;
-import com.github.unafraid.spring.bot.util.BotUtil;
+import XMPP_Telegram.telegrambot.BotUtil;
+import XMPP_Telegram.telegrambot.general.ICommandHandler;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;

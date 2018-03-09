@@ -37,7 +37,7 @@ public class RESTController {
         return "XMPP server started";
     }
 
-    @RequestMapping(value = "/${TELEGRAM_TOKEN}", method = RequestMethod.POST)
+    @RequestMapping(value = "/404271554:AAHHiJHuFsiriACE9u2pV4_3MuENDKcZnKw", method = RequestMethod.POST)
     @ResponseBody
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
         return telegramBotService.onWebhookUpdateReceived(update);

@@ -61,6 +61,9 @@ public class TelegramBotServiceImpl extends TelegramWebhookBot {
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         if (update != null) {
             try {
+                System.out.println(update.getMessage().getChat().getTitle());
+                System.out.println(update.getMessage().getFrom().getUserName());
+                System.out.println(update.getMessage().toString());
                 if (update.hasChosenInlineQuery()) {
                     // Handle Chosen inline query
                     handleUpdate(IChosenInlineQueryHandler.class, update, Update::getChosenInlineQuery, ChosenInlineQuery::getFrom, handler -> handler.onChosenInlineQuery(this, update, update.getChosenInlineQuery()));
@@ -74,9 +77,7 @@ public class TelegramBotServiceImpl extends TelegramWebhookBot {
                     // Handle edited message
                     handleUpdate(IEditedMessageHandler.class, update, Update::getEditedMessage, Message::getFrom, handler -> handler.onEditMessage(this, update, update.getEditedMessage()));
                 } else if (update.hasMessage()) {
-                    System.out.println(update.getMessage().getChat().getTitle());
-                    System.out.println(update.getMessage().getFrom().getUserName());
-                    System.out.println(update.getMessage().toString());
+
                     // Handle message
                     handleIncomingMessage(update);
                 } else {

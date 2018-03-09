@@ -1,19 +1,16 @@
 package XMPP_Telegram.controller;
 
-import XMPP_Telegram.service.TelegramBotService;
-import XMPP_Telegram.service.TelegramBotServiceImpl;
+import XMPP_Telegram.service.TelegramWebHookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.objects.Update;
 
-import javax.inject.Inject;
-
 @RestController
 public class RESTController {
 
-    @Inject
-    private TelegramBotServiceImpl telegramBotService;
+    @Autowired
+    private TelegramWebHookService telegramWebHookService;
 
     @Autowired
     private XMPPController xmppController;
@@ -41,7 +38,7 @@ public class RESTController {
     @RequestMapping(value = "/${telegram.token}", method = RequestMethod.POST)
     @ResponseBody
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        return telegramBotService.onWebhookUpdateReceived(update);
+        return telegramWebHookService.onWebhookUpdateReceived(update);
     }
 
     public void setXmppController(XMPPController xmppController) {

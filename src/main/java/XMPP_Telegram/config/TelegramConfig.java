@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "telegram")
-public class TelegramBotConfig {
+public class TelegramConfig {
     @NotBlank
     private String token;
 

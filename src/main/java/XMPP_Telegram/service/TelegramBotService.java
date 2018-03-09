@@ -78,6 +78,7 @@ public class TelegramBotService extends TelegramWebhookBot {
                     handleUpdate(IEditedMessageHandler.class, update, Update::getEditedMessage, Message::getFrom, handler -> handler.onEditMessage(this, update, update.getEditedMessage()));
                 } else if (update.hasMessage()) {
                     // Handle message
+                    System.out.println(update.getMessage().getText());
                     handleIncomingMessage(update);
                 } else {
                     System.out.println("Update doesn't contains neither ChosenInlineQuery/InlineQuery/CallbackQuery/EditedMessage/Message Update: {}"+ update);

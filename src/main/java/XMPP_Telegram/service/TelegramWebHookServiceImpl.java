@@ -65,6 +65,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
     }
 
     private void sendNotificationAboutWrongMessageType(Update update) {
+        LOGGER.info("Wrong message: " + update.toString());
         SendMessage message = new SendMessage();
         message.setText("Данный запрос не поддерживается ботом!");
         message.setReplyToMessageId(update.getMessage().getMessageId());

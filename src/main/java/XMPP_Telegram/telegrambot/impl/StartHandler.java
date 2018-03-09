@@ -1,0 +1,55 @@
+package XMPP_Telegram.telegrambot.impl;
+
+import XMPP_Telegram.service.TelegramUserService;
+import XMPP_Telegram.telegrambot.BotUtil;
+import XMPP_Telegram.telegrambot.general.ICommandHandler;
+import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.AbsSender;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * @author UnAfraid
+ */
+@Service
+public final class StartHandler implements ICommandHandler {
+    @Inject
+    private TelegramUserService usersService;
+
+    private final AtomicBoolean createdAdmin = new AtomicBoolean();
+
+    @Override
+    public String getCommand() {
+        return "/start";
+    }
+
+    @Override
+    public String getUsage() {
+        return "/start";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Shows greetings message";
+    }
+
+    @Override
+    public void onCommandMessage(AbsSender bot, Update update, Message message, List<String> args) throws TelegramApiException {
+        if (!createdAdmin.get() && usersService.findAll().isEmpty()) {
+            // In case there aren't any users create the first who wrote to the bot as admin and mark as created
+            if (createdAdmin.compareAndSet(false, true)) {
+                usersService.create(message.getFrom().getId(), message.getFrom().getUserName(), 10);
+                BotUtil.sendMessage(bot, message, "Hello master, i am " + bot.getMe().getUserName() + ", if you want to know what i can do type /start", true, false, null);
+            }
+        } else {
+            // In case there's already an admin we won't fetch all users
+            createdAdmin.set(true);
+            BotUtil.sendMessage(bot, message, "Hello, i am " + bot.getMe().getUserName() + ", if you want to know what i can do type /start", true, false, null);
+        }
+    }
+}

@@ -3,13 +3,12 @@ package XMPP_Telegram.model;
 import java.time.LocalDateTime;
 
 public class TelegramUser {
-    private Integer id;
 
+    private Integer id;
     private String name;
     private Integer level;
-
-    protected LocalDateTime createdDate;
-    protected LocalDateTime modifiedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
@@ -50,5 +49,13 @@ public class TelegramUser {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public void setModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

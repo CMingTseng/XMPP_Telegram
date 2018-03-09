@@ -7,7 +7,6 @@ import XMPP_Telegram.service.XMPPAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Controller
@@ -20,7 +19,7 @@ public class XMPPController {
     @Autowired
     private MessageService messageService;
 
-    @PostConstruct
+    @Autowired
     public void start() {
         accounts = accountService.getAll();
         for (XMPPAccount account : accounts) {
@@ -47,10 +46,6 @@ public class XMPPController {
     public void saveMessage (TransferMessage message) {
         messageService.create(message);
 
-    }
-
-    public XMPPAccountService getAccountService() {
-        return accountService;
     }
 
     public void setAccountService(XMPPAccountService accountService) {

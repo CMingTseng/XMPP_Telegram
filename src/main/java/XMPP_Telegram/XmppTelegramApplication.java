@@ -16,12 +16,6 @@ import java.util.Map;
 public class XmppTelegramApplication {
 
 	public static void main(String[] args) {
-		final ConfigurableApplicationContext context =  SpringApplication.run(XmppTelegramApplication.class, args);
-		final Map<String, ICommandHandler> handlers = context.getBeansOfType(ICommandHandler.class);
-		handlers.values().forEach(handler -> {
-			CommandHandler.getInstance().addHandler(handler);
-//			LOGGER.info("Loaded handler: {}", handler.getClass().getSimpleName());
-		});
-//		LOGGER.info("Loaded {} handlers", handlers.size());
+		SpringApplication.run(XmppTelegramApplication.class, args);
 	}
 }

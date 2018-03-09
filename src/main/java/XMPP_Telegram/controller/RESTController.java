@@ -1,6 +1,7 @@
 package XMPP_Telegram.controller;
 
 import XMPP_Telegram.service.TelegramBotService;
+import XMPP_Telegram.service.TelegramBotServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
@@ -12,7 +13,7 @@ import javax.inject.Inject;
 public class RESTController {
 
     @Inject
-    private TelegramBotService telegramBotService;
+    private TelegramBotServiceImpl telegramBotService;
 
     @Autowired
     private XMPPController xmppController;
@@ -37,7 +38,7 @@ public class RESTController {
         return "XMPP server started";
     }
 
-    @RequestMapping(value = "/404271554:AAHHiJHuFsiriACE9u2pV4_3MuENDKcZnKw", method = RequestMethod.POST)
+    @RequestMapping(value = "/${telegram.token}", method = RequestMethod.POST)
     @ResponseBody
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
         return telegramBotService.onWebhookUpdateReceived(update);

@@ -1,35 +1,15 @@
 package XMPP_Telegram.model;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TelegramUser {
 
     private Integer id;
+
     private String name;
-    private Integer level;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public LocalDateTime getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public TelegramUser() {
-        this.createdDate = LocalDateTime.now();
-        this.modifiedDate = LocalDateTime.now();
-    }
-
-    public TelegramUser(int id, String name, int level) {
-        this.id = id;
-        this.name = name;
-        this.level = level;
-        this.createdDate = LocalDateTime.now();
-        this.modifiedDate = LocalDateTime.now();
-    }
+    private List<XMPPAccount> accounts = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -43,19 +23,27 @@ public class TelegramUser {
         this.name = name;
     }
 
-    public int getLevel() {
-        return this.level;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    public List<XMPPAccount> getAccounts() {
+        return accounts;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void addAccount(XMPPAccount account) {
+        accounts.add(account);
     }
 
-    public void setModifiedDate(LocalDateTime modifiedDate) {
-        this.modifiedDate = modifiedDate;
+    public XMPPAccount getAccountById(int id) {
+        for (XMPPAccount account : accounts) {
+            if (account.getId() == id)
+                return account;
+        }
+        return null;
+    }
+
+    public void deleteAccount(XMPPAccount account) {
+        accounts.remove(account);
     }
 }

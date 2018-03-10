@@ -72,6 +72,6 @@ CREATE TABLE telegram_chats
 );
 CREATE UNIQUE INDEX telegram_chats_chatid_index
   ON telegram_chats (chatid);
-CREATE INDEX telegram_chats_index
+CREATE UNIQUE INDEX telegram_chats_index
   ON telegram_chats (chatid, telegramuser, xmppaccount, xmppcontact);
 

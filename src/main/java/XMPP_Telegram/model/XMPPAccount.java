@@ -12,6 +12,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
 
 import javax.annotation.PreDestroy;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class XMPPAccount {
@@ -35,6 +37,10 @@ public class XMPPAccount {
     private ChatManager chatManager;
 
     private XMPPController controller;
+
+    private TelegramUser telegramUser;
+
+    private Map<String, Long> map;
 
     public XMPPAccount() {
         connection = new XMPPConnection(this);
@@ -88,7 +94,6 @@ public class XMPPAccount {
     public void disconnect() {
         connection.close();
     }
-
 
     public boolean isAlive() {
         return connection.getConnection().isConnected();
@@ -152,6 +157,22 @@ public class XMPPAccount {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Map<String, Long> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Long> map) {
+        this.map = map;
+    }
+
+    public TelegramUser getTelegramUser() {
+        return telegramUser;
+    }
+
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
     }
 
     @Override

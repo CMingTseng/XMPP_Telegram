@@ -13,13 +13,17 @@ import java.util.List;
 public class XMPPController {
     private List<XMPPAccount> accounts;
 
+    private boolean started = false;
+
+    @Autowired
+    private TelegramController telegramController;
+
     @Autowired
     private XMPPAccountService accountService;
 
     @Autowired
-    private MessageService messageService;
+    private MessageController messageController;
 
-    @Autowired
     public void start() {
         accounts = accountService.getAll();
         for (XMPPAccount account : accounts) {
@@ -27,12 +31,21 @@ public class XMPPController {
             if (account.isActive())
                 account.connect();
         }
+        started=true;
     }
 
     public void stop() {
         for (XMPPAccount account : accounts) {
             account.disconnect();
         }
+    }
+
+    public XMPPAccount getAccountById(int id) {
+        for (XMPPAccount account : accounts) {
+            if (account.getId()==id)
+                return account;
+        }
+        return null;
     }
 
     public void disconnectAccount(XMPPAccount account) {
@@ -44,7 +57,7 @@ public class XMPPController {
     }
 
     public void saveMessage (TransferMessage message) {
-        messageService.create(message);
+//        messageService.create(message);
 
     }
 
@@ -56,7 +69,15 @@ public class XMPPController {
         return accounts;
     }
 
-    public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+    public void setMessageController(MessageController messageController) {
+        this.messageController = messageController;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setTelegramController(TelegramController telegramController) {
+        this.telegramController = telegramController;
     }
 }

@@ -10,12 +10,8 @@ import java.util.List;
 @Service
 public class XMPPAccountServiceImpl implements XMPPAccountService {
 
-    private final XMPPAccountRepository repository;
-
     @Autowired
-    public XMPPAccountServiceImpl(XMPPAccountRepository repository) {
-        this.repository = repository;
-    }
+    private XMPPAccountRepository repository;
 
     @Override
     public List<XMPPAccount> getAll() {
@@ -44,5 +40,7 @@ public class XMPPAccountServiceImpl implements XMPPAccountService {
         return get(server, login);
     }
 
-
+    public void setRepository(XMPPAccountRepository repository) {
+        this.repository = repository;
+    }
 }

@@ -12,33 +12,59 @@ import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.EntityBareJid;
 
 import javax.annotation.PreDestroy;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Entity
+@Table(name = "xmpp_accounts", uniqueConstraints = {@UniqueConstraint(columnNames = {"login","server"}, name = "xmpp_accounts_login_server_index")})
 public class XMPPAccount {
 
+    @Id
     private int id;
 
+    @Column(name = "server")
+    @NotNull
+    @NotBlank
     private String server;
 
+    @Column(name = "login")
+    @NotNull
+    @NotBlank
     private String login;
 
+    @Column(name = "password")
+    @NotNull
+    @NotBlank
     private String password;
 
+    @Column(name = "port", columnDefinition = "5222")
+    @NotNull
+    @NotBlank
     private int port;
 
+    @Column(name = "savehistory", columnDefinition = "1")
+    @NotNull
+    @NotBlank
     private boolean saveHistory;
 
+    @Column(name = "active", columnDefinition = "1")
+    @NotNull
+    @NotBlank
     private boolean active;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "telegramuser", nullable = false)
+    @NotNull
+    private TelegramUser telegramUser;
 
     private XMPPConnection connection;
 
     private ChatManager chatManager;
 
     private XMPPController controller;
-
-    private TelegramUser telegramUser;
 
     private Map<String, Long> map;
 

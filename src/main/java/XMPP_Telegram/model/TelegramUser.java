@@ -1,15 +1,21 @@
 package XMPP_Telegram.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
+@Entity
+@Table(name = "telegram_users")
 public class TelegramUser {
 
+    @Id
     private Integer id;
 
+    @Column(name = "username")
     private String name;
 
-    private List<XMPPAccount> accounts = new ArrayList<>();
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "xmpp_accounts", cascade = CascadeType.ALL)
+    private Set<XMPPAccount> accounts = new HashSet<>();
 
     public int getId() {
         return id;
@@ -27,7 +33,7 @@ public class TelegramUser {
         this.id = id;
     }
 
-    public List<XMPPAccount> getAccounts() {
+    public Set<XMPPAccount> getAccounts() {
         return accounts;
     }
 

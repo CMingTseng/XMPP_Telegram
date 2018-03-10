@@ -53,6 +53,10 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
                     sendNotificationAboutWrongMessageType(update);
                 } else if (update.hasMessage()) {
                     LOGGER.info("Message to bot: "+ update.toString());
+                    SendMessage message = new SendMessage();
+                    message.setText("Ответ!!");
+                    message.setChatId(update.getMessage().getChatId());
+                    sendApiMethod(message);
                     // Handle message
                 } else {
                     LOGGER.warn("Update doesn't contains neither ChosenInlineQuery/InlineQuery/CallbackQuery/EditedMessage/Message Update: {}", update);

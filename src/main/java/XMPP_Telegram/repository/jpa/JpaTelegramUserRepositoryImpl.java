@@ -16,17 +16,15 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
 
     @Override
     public List<TelegramUser> getAll() {
-        return null;
-    }
-
-    @Override
-    public TelegramUser getByName(String name) {
-        return null;
+        return entityManager.createNamedQuery(TelegramUser.ALL, TelegramUser.class)
+                .getResultList();
     }
 
     @Override
     public TelegramUser getById(int id) {
-        return null;
+        return entityManager.createNamedQuery(TelegramUser.GET_BY_ID, TelegramUser.class)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 
     @Override

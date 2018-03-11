@@ -14,4 +14,6 @@ public interface XMPPAccountRepository {
     int update(XMPPAccount account, String server, String login, String password, int port);
 
     void create (String server, String login, String password, int port);
+
+    XMPPAccount getById(int id);
 }

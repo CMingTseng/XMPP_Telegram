@@ -1,10 +1,12 @@
 package XMPP_Telegram.service;
 
 import XMPP_Telegram.model.XMPPAccount;
+import XMPP_Telegram.model.XMPPConnection;
 import XMPP_Telegram.repository.XMPPAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,8 +16,14 @@ public class XMPPAccountServiceImpl implements XMPPAccountService {
     private XMPPAccountRepository repository;
 
     @Override
-    public List<XMPPAccount> getAll() {
-        return repository.getAll();
+    public List<XMPPConnection> getAllConnections() {
+        List<XMPPAccount> list = repository.getAll();
+        List<XMPPConnection> result = new ArrayList<>();
+        for (XMPPAccount account : list) {
+            if (account.isActive())
+                result.add(new XMPPConnection(account));
+        }
+        return result;
     }
 
     @Override
@@ -40,7 +48,8 @@ public class XMPPAccountServiceImpl implements XMPPAccountService {
         return get(server, login);
     }
 
-    public void setRepository(XMPPAccountRepository repository) {
-        this.repository = repository;
+    @Override
+    public XMPPAccount getById(int id) {
+        return repository.getById(id);
     }
 }

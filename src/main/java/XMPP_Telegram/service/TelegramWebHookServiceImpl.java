@@ -1,7 +1,8 @@
 package XMPP_Telegram.service;
 
 import XMPP_Telegram.config.TelegramConfig;
-import XMPP_Telegram.util.TelegramUtil;
+import XMPP_Telegram.model.ChatMap;
+import XMPP_Telegram.util.BotUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -12,12 +13,8 @@ import org.telegram.telegrambots.ApiConstants;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updates.SetWebhook;
-import org.telegram.telegrambots.api.objects.CallbackQuery;
-import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.WebhookInfo;
-import org.telegram.telegrambots.api.objects.inlinequery.ChosenInlineQuery;
-import org.telegram.telegrambots.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
@@ -64,6 +61,18 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         return null;
     }
 
+    private void sendMessage (ChatMap map, String text) {
+        SendMessage message = new SendMessage();
+        message.setText(text);
+        message.setChatId(map.getChatId());
+        try {
+            LOGGER.info("Отправляем сообщение: " + message.toString());
+            sendApiMethod(message);
+        } catch (TelegramApiException e) {
+            //TODO
+        }
+    }
+
     private void sendNotificationAboutWrongMessageType(Update update) {
         LOGGER.info("Wrong message: " + update.toString());
         SendMessage message = new SendMessage();
@@ -84,7 +93,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
             setWebhook.setUrl(url);
             setWebhook.setCertificateFile(publicCertificatePath);
 
-            final String responseContent = TelegramUtil.doPostJSONQuery(this, SetWebhook.PATH, setWebhook);
+            final String responseContent = BotUtil.doPostJSONQuery(this, SetWebhook.PATH, setWebhook);
             final JSONObject jsonObject = new JSONObject(responseContent);
             if (!jsonObject.getBoolean(ApiConstants.RESPONSE_FIELD_OK)) {
                 throw new TelegramApiRequestException("Error setting web hook", jsonObject);

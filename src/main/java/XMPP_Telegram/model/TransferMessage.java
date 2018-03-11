@@ -10,9 +10,13 @@ public class TransferMessage {
 
     private String text;
 
-    private XMPPAccount account;
+    private XMPPAccount xmppAccount;
+
+    private TelegramUser telegramUser;
 
     private String contact;
+
+    private long chatId;
 
     private boolean fromXMPP;
 
@@ -23,13 +27,15 @@ public class TransferMessage {
     public TransferMessage() {
     }
 
-    public TransferMessage(Message message, XMPPAccount account) {
+    public TransferMessage(Message message, XMPPAccount xmppAccount) {
         this.text = message.getBody();
-        this.account = account;
+        this.xmppAccount = xmppAccount;
         this.contact = message.getFrom().asBareJid().toString();
         date = new Date();
         fromXMPP = true;
     }
+
+
 
     public long getId() {
         return id;
@@ -47,12 +53,12 @@ public class TransferMessage {
         this.text = text;
     }
 
-    public XMPPAccount getAccount() {
-        return account;
+    public XMPPAccount getXmppAccount() {
+        return xmppAccount;
     }
 
-    public void setAccount(XMPPAccount account) {
-        this.account = account;
+    public void setXmppAccount(XMPPAccount xmppAccount) {
+        this.xmppAccount = xmppAccount;
     }
 
     public String getContact() {
@@ -87,12 +93,28 @@ public class TransferMessage {
         this.sent = sent;
     }
 
+    public TelegramUser getTelegramUser() {
+        return telegramUser;
+    }
+
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
+    }
+
+    public long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
     @Override
     public String toString() {
         return "TransferMessage{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", account=" + account +
+                ", xmppAccount=" + xmppAccount +
                 ", contact='" + contact + '\'' +
                 ", fromXMPP=" + fromXMPP +
                 ", sent=" + sent +

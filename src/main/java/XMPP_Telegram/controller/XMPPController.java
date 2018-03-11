@@ -2,82 +2,78 @@ package XMPP_Telegram.controller;
 
 import XMPP_Telegram.model.TransferMessage;
 import XMPP_Telegram.model.XMPPAccount;
+import XMPP_Telegram.model.XMPPConnection;
 import XMPP_Telegram.service.MessageService;
 import XMPP_Telegram.service.XMPPAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Controller
 public class XMPPController {
-    private List<XMPPAccount> accounts;
+    private List<XMPPConnection> connections;
 
-    private boolean started = false;
-
-    @Autowired
-    private TelegramController telegramController;
-
-    @Autowired
     private XMPPAccountService accountService;
 
-    @Autowired
-    private MessageController messageController;
+    private MessageService messageService;
 
+    @Autowired
+    public XMPPController(XMPPAccountService accountService, MessageService messageService) {
+        this.accountService = accountService;
+        this.messageService = messageService;
+    }
+
+    @PostConstruct
     public void start() {
-        accounts = accountService.getAll();
-        for (XMPPAccount account : accounts) {
-            account.setController(this);
-            if (account.isActive())
-                account.connect();
+        if (connections == null) {
+            connections = accountService.getAllConnections();
+            for (XMPPConnection connection : connections) {
+                connection.setController(this);
+                if (!connection.isConnected())
+                    try {
+                        connection.createConnection();
+                    } catch (Exception e) {
+                        //TODO
+                    }
+            }
         }
-        started=true;
     }
 
     public void stop() {
-        for (XMPPAccount account : accounts) {
-            account.disconnect();
+        if (connections != null) {
+            for (XMPPConnection connection : connections) {
+                connection.close();
+            }
+            connections = null;
         }
-    }
-
-    public XMPPAccount getAccountById(int id) {
-        for (XMPPAccount account : accounts) {
-            if (account.getId()==id)
-                return account;
-        }
-        return null;
     }
 
     public void disconnectAccount(XMPPAccount account) {
-        account.disconnect();
+       for (XMPPConnection connection : connections) {
+           if (connection.equalsByXMPPAccount(account)) {
+               connection.close();
+               connections.remove(connection);
+               return;
+           }
+       }
     }
 
-    public void connectAccount (XMPPAccount account) {
-        account.connect();
+    public void connectAccount(XMPPAccount account) {
+        XMPPConnection connection = new XMPPConnection(account);
+        connection.setController(this);
+        connections.add(connection);
+        try {
+            connection.createConnection();
+        } catch (Exception e) {
+            //TODO
+        }
     }
 
-    public void saveMessage (TransferMessage message) {
-//        messageService.create(message);
+    public void receivedMessage(String server, String login, String contact, String text) {
+        XMPPAccount account = accountService.get(server, login);
+        messageService.messageFromXMPP();
 
-    }
-
-    public void setAccountService(XMPPAccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    public List<XMPPAccount> getAccounts() {
-        return accounts;
-    }
-
-    public void setMessageController(MessageController messageController) {
-        this.messageController = messageController;
-    }
-
-    public boolean isStarted() {
-        return started;
-    }
-
-    public void setTelegramController(TelegramController telegramController) {
-        this.telegramController = telegramController;
     }
 }

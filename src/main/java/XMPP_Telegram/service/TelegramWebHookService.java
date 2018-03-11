@@ -1,6 +1,6 @@
 package XMPP_Telegram.service;
 
-import XMPP_Telegram.util.TelegramUtil;
+import XMPP_Telegram.util.BotUtil;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.groupadministration.SetChatPhoto;
 import org.telegram.telegrambots.api.methods.send.*;
@@ -9,10 +9,8 @@ import org.telegram.telegrambots.api.methods.stickers.CreateNewStickerSet;
 import org.telegram.telegrambots.api.methods.stickers.UploadStickerFile;
 import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.generics.WebhookBot;
 import org.telegram.telegrambots.updateshandlers.SentCallback;
 
@@ -26,7 +24,7 @@ public abstract class TelegramWebHookService extends AbsSender implements Webhoo
         method.validate();
 
         try {
-            final String result = TelegramUtil.doPostJSONQuery(this, method.getMethod(), method);
+            final String result = BotUtil.doPostJSONQuery(this, method.getMethod(), method);
             return method.deserializeResponse(result);
         } catch (Exception e) {
             throw new TelegramApiException("Unable to execute " + method.getMethod() + " method", e);

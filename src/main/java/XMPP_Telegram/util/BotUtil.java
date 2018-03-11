@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class TelegramUtil {
+public class BotUtil {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    public static final Map<String, String> STANDARD_HEADERS;
+    private static final Map<String, String> STANDARD_HEADERS;
 
     static {
         final Map<String, String> headers = new HashMap<>();
@@ -71,5 +71,20 @@ public class TelegramUtil {
         } catch (Exception e) {
             throw new TelegramApiException("Unable to execute post query", e);
         }
+    }
+
+    public static String getXMPPServer(String address) {
+        if (address.matches("^.*[@]{1}.*[/]{1}.*$")) {
+            String[] result = address.split("@");
+            result = result[1].split("/");
+            return result[0];
+        }else return "";
+    }
+
+    public static String getXMPPLogin(String address) {
+        if (address.matches("^.*[@]{1}.*[/]{1}.*$")) {
+            String[] result = address.split("@");
+            return result[0];
+        } else return "";
     }
 }

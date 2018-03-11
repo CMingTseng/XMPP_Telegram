@@ -7,8 +7,6 @@ import java.util.List;
 public interface TelegramUserRepository {
     List<TelegramUser> getAll();
 
-    TelegramUser getByName(String name);
-
     TelegramUser getById (int id);
 
     int delete(TelegramUser user);

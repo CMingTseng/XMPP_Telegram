@@ -1,5 +1,6 @@
 package XMPP_Telegram.controller;
 
+import XMPP_Telegram.service.ChatMapService;
 import XMPP_Telegram.service.TelegramWebHookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,13 @@ public class RESTController {
     @Autowired
     private XMPPController xmppController;
 
+    @Autowired
+    private ChatMapService mapService;
+
     @RequestMapping("/")
-    public void test() {}
+    public String test() {
+        return "test";
+    }
 
     @RequestMapping("/secured")
     public String secured(){
@@ -39,9 +45,5 @@ public class RESTController {
     @ResponseBody
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
         return telegramWebHookService.onWebhookUpdateReceived(update);
-    }
-
-    public void setXmppController(XMPPController xmppController) {
-        this.xmppController = xmppController;
     }
 }

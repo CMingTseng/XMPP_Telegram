@@ -12,12 +12,7 @@ public interface TelegramUserService {
 
     TelegramUser delete(int id);
 
-    TelegramUser findById(int id);
+    TelegramUser getById(int id);
 
-    TelegramUser findByName(String name);
-
-    List<TelegramUser> findAll();
-
-    boolean validate(int id, int level);
-
+    List<TelegramUser> getAll();
 }

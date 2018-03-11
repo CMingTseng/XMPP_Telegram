@@ -18,12 +18,16 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
 
     @Override
     public List<XMPPAccount> getAll() {
-        return null;
+        return entityManager.createNamedQuery(XMPPAccount.ALL, XMPPAccount.class)
+                .getResultList();
     }
 
     @Override
     public XMPPAccount get(String server, String login) {
-        return null;
+        return entityManager.createNamedQuery(XMPPAccount.GET_BY_LOGIN_AND_SERVER, XMPPAccount.class)
+                .setParameter("server", server)
+                .setParameter("login", login)
+                .getSingleResult();
     }
 
     @Override
@@ -39,5 +43,10 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     @Override
     public void create(String server, String login, String password, int port) {
 
+    }
+
+    @Override
+    public XMPPAccount getById(int id) {
+        return entityManager.find(XMPPAccount.class, id);
     }
 }

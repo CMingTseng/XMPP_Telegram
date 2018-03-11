@@ -73,7 +73,7 @@ public class XMPPController {
 
     public void receivedMessage(String server, String login, String contact, String text) {
         XMPPAccount account = accountService.get(server, login);
-        messageService.messageFromXMPP();
+        messageService.messageFromXMPP(account, contact,text);
 
     }
 }

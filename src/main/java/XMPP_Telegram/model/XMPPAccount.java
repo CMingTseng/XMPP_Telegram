@@ -1,21 +1,10 @@
 package XMPP_Telegram.model;
 
 
-import XMPP_Telegram.controller.XMPPController;
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.chat2.Chat;
-import org.jivesoftware.smack.chat2.ChatManager;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
-import org.jivesoftware.smack.packet.EmptyResultIQ;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Message;
-import org.jxmpp.jid.EntityBareJid;
+import org.hibernate.validator.constraints.NotBlank;
 
-import javax.annotation.PreDestroy;
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @SuppressWarnings("JpaQlInspection")
 @NamedQueries({

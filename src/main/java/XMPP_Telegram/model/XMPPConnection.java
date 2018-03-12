@@ -96,8 +96,8 @@ public class XMPPConnection {
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
 //                        try {
-                        map.put(message.getFrom().asDomainBareJid().toString(), chat);
-                        controller.receiveXMPPMessage(server, login, message.getFrom().asDomainBareJid().toString(), message.getBody());
+                        map.put(message.getFrom().asEntityBareJidIfPossible().toString(), chat);
+                        controller.receiveXMPPMessage(server, login, message.getFrom().asEntityBareJidIfPossible().toString(), message.getBody());
 //                            IQ iq = new EmptyResultIQ();
 //                            iq.setType(IQ.Type.result);
 //                            iq.setStanzaId(message.getStanzaId());

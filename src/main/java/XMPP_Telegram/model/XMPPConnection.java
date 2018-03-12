@@ -29,6 +29,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XMPPConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
@@ -43,6 +45,7 @@ public class XMPPConnection {
     private IncomingChatMessageListener listener;
     private XMPPController controller;
     private SSLSetting sslSetting = new SSLSetting();
+    private Map<String, Chat> map;
 
     public XMPPConnection(XMPPAccount xmppAccount) {
         server = xmppAccount.getServer();
@@ -86,22 +89,24 @@ public class XMPPConnection {
             configure();
             connect();
             login();
+            map = new HashMap<String, Chat>();
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(listener = new IncomingChatMessageListener() {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
-                        try {
-                            controller.receiveXMPPMessage(server, login, BotUtil.getXMPPLogin(message.getFrom().toString()), message.getBody());
-                            IQ iq = new EmptyResultIQ();
-                            iq.setType(IQ.Type.result);
-                            iq.setStanzaId(message.getStanzaId());
-                            iq.setTo(from);
-                            connection.sendStanza(iq);
-                        } catch (SmackException.NotConnectedException | InterruptedException e) {
-                            //TODO
-                            e.printStackTrace();
-                        }
+//                        try {
+                        map.put(BotUtil.getXMPPLogin(message.getFrom().toString()), chat);
+                        controller.receiveXMPPMessage(server, login, BotUtil.getXMPPLogin(message.getFrom().toString()), message.getBody());
+//                            IQ iq = new EmptyResultIQ();
+//                            iq.setType(IQ.Type.result);
+//                            iq.setStanzaId(message.getStanzaId());
+//                            iq.setTo(from);
+//                            connection.sendStanza(iq);
+//                        } catch (SmackException.NotConnectedException | InterruptedException e) {
+//                            //TODO
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             });
@@ -118,19 +123,28 @@ public class XMPPConnection {
             connection.disconnect();
     }
 
-    public void sendMessage(ChatMap map, String text) {
+    public void sendMessage(ChatMap chatMap, String text) {
         Message message = new Message();
+        message.setType(Message.Type.chat);
+        message.setBody(text);
         try {
-            message.setType(Message.Type.chat);
-            LOGGER.info("Данные контакта: " + map.getXmppContact());
-            Jid to = JidCreate.entityBareFrom(map.getXmppContact() + "@" + server);
-            LOGGER.info("Данные контакта после образования: " + to.toString());
-            message.setTo(to);
-            message.setBody(text);
-            connection.sendStanza(message);
+            if (!map.containsKey(chatMap.getXmppContact())) {
+                EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact() + "@" + server);
+                map.put(chatMap.getXmppContact(), chatManager.chatWith(to));
+            }
+            map.get(chatMap.getXmppContact()).send(message);
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             LOGGER.warn("Can't send message to XMPP! " + message.toString());
         }
+//        try {
+//
+//            Jid to = JidCreate.entityBareFrom(map.getXmppContact() + "@" + server);
+//            message.setTo(to);
+//
+//            connection.sendStanza(message);
+//        } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
+//            LOGGER.warn("Can't send message to XMPP! " + message.toString());
+//        }
     }
 
     public boolean isConnected() {

@@ -132,6 +132,8 @@ public class XMPPConnection {
                 EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact() + "@" + server);
                 map.put(chatMap.getXmppContact(), chatManager.chatWith(to));
             }
+
+            message.setFrom(map.get(chatMap.getXmppContact()).getXmppAddressOfChatPartner());
             map.get(chatMap.getXmppContact()).send(message);
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             LOGGER.warn("Can't send message to XMPP! " + message.toString());

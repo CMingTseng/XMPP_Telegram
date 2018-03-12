@@ -1,11 +1,13 @@
 package XMPP_Telegram.controller;
 
 import XMPP_Telegram.model.ChatMap;
-import XMPP_Telegram.model.TransferMessage;
 import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.model.XMPPConnection;
 import XMPP_Telegram.service.MessageService;
+import XMPP_Telegram.service.TelegramWebHookService;
 import XMPP_Telegram.service.XMPPAccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Controller
 public class XMPPController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
+
     private List<XMPPConnection> connections;
 
     private XMPPAccountService accountService;
@@ -78,9 +82,11 @@ public class XMPPController {
     }
 
     public void sendXMPPMessage(ChatMap map, String text) {
+        LOGGER.info("Отправка сообщения в XMPP: " + map.toString());
         for (XMPPConnection connection : connections) {
             if (connection.equalsByXMPPAccount(map.getXmppAccount())) {
                 connection.sendMessage(map, text);
+                LOGGER.info("Отправка сообщения в аккаунту:");
                 return;
             }
         }

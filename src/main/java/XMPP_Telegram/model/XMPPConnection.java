@@ -124,6 +124,7 @@ public class XMPPConnection {
             message.setType(Message.Type.chat);
             Jid to = JidCreate.domainBareFrom(map.getXmppContact() + "@" + server);
             message.setTo(to);
+            message.setBody(text);
             connection.sendStanza(message);
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             LOGGER.warn("Can't send message to XMPP! " + message.toString());

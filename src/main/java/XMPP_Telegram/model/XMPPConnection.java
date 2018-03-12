@@ -133,6 +133,7 @@ public class XMPPConnection {
                 EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact() + "@" + server);
                 map.put(chatMap.getXmppContact(), chatManager.chatWith(to));
             }
+            LOGGER.info(map.get(chatMap.getXmppContact()).getXmppAddressOfChatPartner().asEntityBareJid().toString());
             message.setFrom(map.get(chatMap.getXmppContact()).getXmppAddressOfChatPartner().asEntityBareJid());
             map.get(chatMap.getXmppContact()).send(message);
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {

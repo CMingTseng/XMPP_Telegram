@@ -73,17 +73,9 @@ public class BotUtil {
         }
     }
 
-    public static String getXMPPServer(String address) {
-        if (address.matches("^.*[@]{1}.*[/]{1}.*$")) {
-            String[] result = address.split("@");
-            result = result[1].split("/");
-            return result[0];
-        }else return "";
-    }
-
     public static String getXMPPLogin(String address) {
         if (address.matches("^.*[@]{1}.*[/]{1}.*$")) {
-            String[] result = address.split("@");
+            String[] result = address.split("/");
             return result[0];
         } else return "";
     }

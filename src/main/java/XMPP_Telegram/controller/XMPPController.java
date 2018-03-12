@@ -82,11 +82,9 @@ public class XMPPController {
     }
 
     public void sendXMPPMessage(ChatMap map, String text) {
-        LOGGER.info("Отправка сообщения в XMPP: " + map.toString());
         for (XMPPConnection connection : connections) {
             if (connection.equalsByXMPPAccount(map.getXmppAccount())) {
                 connection.sendMessage(map, text);
-                LOGGER.info("Отправка сообщения в аккаунту:");
                 return;
             }
         }

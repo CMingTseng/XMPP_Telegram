@@ -96,8 +96,8 @@ public class XMPPConnection {
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
 //                        try {
-                        map.put(BotUtil.getXMPPLogin(message.getFrom().toString()), chat);
-                        controller.receiveXMPPMessage(server, login, BotUtil.getXMPPLogin(message.getFrom().toString()), message.getBody());
+                        map.put(message.getFrom().asDomainBareJid().toString(), chat);
+                        controller.receiveXMPPMessage(server, login, message.getFrom().asDomainBareJid().toString(), message.getBody());
 //                            IQ iq = new EmptyResultIQ();
 //                            iq.setType(IQ.Type.result);
 //                            iq.setStanzaId(message.getStanzaId());
@@ -129,25 +129,13 @@ public class XMPPConnection {
         message.setBody(text);
         try {
             if (!map.containsKey(chatMap.getXmppContact())) {
-                LOGGER.info("Новый чат!");
-                EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact() + "@" + server);
+                EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact());
                 map.put(chatMap.getXmppContact(), chatManager.chatWith(to));
             }
-            LOGGER.info(map.get(chatMap.getXmppContact()).getXmppAddressOfChatPartner().asEntityBareJid().toString());
-            message.setFrom(map.get(chatMap.getXmppContact()).getXmppAddressOfChatPartner().asEntityBareJid());
             map.get(chatMap.getXmppContact()).send(message);
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             LOGGER.warn("Can't send message to XMPP! " + message.toString());
         }
-//        try {
-//
-//            Jid to = JidCreate.entityBareFrom(map.getXmppContact() + "@" + server);
-//            message.setTo(to);
-//
-//            connection.sendStanza(message);
-//        } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
-//            LOGGER.warn("Can't send message to XMPP! " + message.toString());
-//        }
     }
 
     public boolean isConnected() {

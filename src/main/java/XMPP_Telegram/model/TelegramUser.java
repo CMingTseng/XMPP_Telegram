@@ -22,7 +22,7 @@ public class TelegramUser {
     @Column(name = "username")
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "telegramUser", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "telegramUser", cascade = CascadeType.ALL)
     private Set<XMPPAccount> accounts = new HashSet<>();
 
     public int getId() {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class JpaMessagePerositoryImpl implements MessageRepository {
+public class JpaMessageRerositoryImpl implements MessageRepository {
     @Override
     public List<TransferMessage> readNotSent(XMPPAccount account) {
         return null;

@@ -2,6 +2,9 @@ package XMPP_Telegram.repository.jpa;
 
 import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.repository.XMPPAccountRepository;
+import XMPP_Telegram.service.TelegramWebHookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +15,7 @@ import java.util.List;
 @Repository
 @Transactional(readOnly = true)
 public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -24,10 +28,15 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
 
     @Override
     public XMPPAccount get(String server, String login) {
+        try {
         return entityManager.createNamedQuery(XMPPAccount.GET_BY_LOGIN_AND_SERVER, XMPPAccount.class)
                 .setParameter("server", server)
                 .setParameter("login", login)
                 .getSingleResult();
+        } catch (Exception e) {
+            LOGGER.warn(String.format("User not found login: %s, server %s", login, server), e);
+            return null;
+        }
     }
 
     @Override

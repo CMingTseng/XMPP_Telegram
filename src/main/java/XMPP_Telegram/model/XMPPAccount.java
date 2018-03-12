@@ -51,7 +51,7 @@ public class XMPPAccount {
     @NotBlank
     private boolean active;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "telegramuser", nullable = false)
     @NotNull
     private TelegramUser telegramUser;

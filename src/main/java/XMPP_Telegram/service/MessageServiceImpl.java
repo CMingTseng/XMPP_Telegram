@@ -8,6 +8,7 @@ import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -32,12 +33,23 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void messageFromXMPP(XMPPAccount account, String contact, String text) {
         ChatMap map = chatMapService.sendToTelegram(account, contact);
+        if (map == null) {
+            map = new ChatMap();
+            map.setXmppContact(contact);
+            map.setXmppAccount(account);
+            map.setTelegramUser(account.getTelegramUser());
+            map.setChatId(account.getTelegramUser().getId());
+            text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
+        }
         telegramWebHookService.sendTelegramMessage(map, text);
     }
 
     @Override
     public void messageFromTelegram(TelegramUser user, long chatId, String text) {
         ChatMap map = chatMapService.sendToXMPP(user, chatId);
+        if (map==null) {
+            return;
+        }
         xmppController.sendXMPPMessage(map, text);
     }
 

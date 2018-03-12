@@ -73,7 +73,6 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         message.setText(text);
         message.setChatId(map.getChatId());
         try {
-            LOGGER.info("Отправляем сообщение: " + message.toString());
             sendApiMethod(message);
         } catch (TelegramApiException e) {
             //TODO

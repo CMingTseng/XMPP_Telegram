@@ -58,6 +58,22 @@ public class ChatMap {
         return xmppContact;
     }
 
+    public void setChatId(long chatId) {
+        this.chatId = chatId;
+    }
+
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
+    }
+
+    public void setXmppAccount(XMPPAccount xmppAccount) {
+        this.xmppAccount = xmppAccount;
+    }
+
+    public void setXmppContact(String xmppContact) {
+        this.xmppContact = xmppContact;
+    }
+
     @Override
     public String toString() {
         return "ChatMap{" +

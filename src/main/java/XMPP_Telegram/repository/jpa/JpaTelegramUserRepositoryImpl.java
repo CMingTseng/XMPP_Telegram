@@ -2,6 +2,9 @@ package XMPP_Telegram.repository.jpa;
 
 import XMPP_Telegram.model.TelegramUser;
 import XMPP_Telegram.repository.TelegramUserRepository;
+import XMPP_Telegram.service.TelegramWebHookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -10,6 +13,7 @@ import java.util.List;
 
 @Repository
 public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -22,9 +26,14 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
 
     @Override
     public TelegramUser getById(int id) {
+        try {
         return entityManager.createNamedQuery(TelegramUser.GET_BY_ID, TelegramUser.class)
                 .setParameter("id", id)
                 .getSingleResult();
+        } catch (Exception e) {
+            LOGGER.warn(String.format("User not found %d", id), e);
+            return null;
+        }
     }
 
     @Override

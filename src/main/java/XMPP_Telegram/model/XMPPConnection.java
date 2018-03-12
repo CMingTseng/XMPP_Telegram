@@ -122,7 +122,9 @@ public class XMPPConnection {
         Message message = new Message();
         try {
             message.setType(Message.Type.chat);
-            Jid to = JidCreate.domainBareFrom(map.getXmppContact() + "@" + server);
+            LOGGER.info("Данные контакта: " + map.getXmppContact());
+            Jid to = JidCreate.entityBareFrom(map.getXmppContact() + "@" + server);
+            LOGGER.info("Данные контакта после образования: " + to.toString());
             message.setTo(to);
             message.setBody(text);
             connection.sendStanza(message);

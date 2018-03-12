@@ -72,11 +72,4 @@ public class BotUtil {
             throw new TelegramApiException("Unable to execute post query", e);
         }
     }
-
-    public static String getXMPPLogin(String address) {
-        if (address.matches("^.*[@]{1}.*[/]{1}.*$")) {
-            String[] result = address.split("/");
-            return result[0];
-        } else return "";
-    }
 }

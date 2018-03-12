@@ -22,12 +22,12 @@ public class XMPPController {
 
     private XMPPAccountService accountService;
 
+    @Autowired
     private MessageService messageService;
 
     @Autowired
-    public XMPPController(XMPPAccountService accountService, MessageService messageService) {
+    public XMPPController(XMPPAccountService accountService) {
         this.accountService = accountService;
-        this.messageService = messageService;
     }
 
     @PostConstruct

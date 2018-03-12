@@ -92,7 +92,7 @@ public class XMPPConnection {
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
                         try {
-                            controller.receivedMessage(server, login, BotUtil.getXMPPLogin(message.getFrom().toString()), message.getBody());
+                            controller.receiveXMPPMessage(server, login, BotUtil.getXMPPLogin(message.getFrom().toString()), message.getBody());
                             IQ iq = new EmptyResultIQ();
                             iq.setType(IQ.Type.result);
                             iq.setStanzaId(message.getStanzaId());

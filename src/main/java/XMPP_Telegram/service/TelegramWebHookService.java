@@ -38,7 +38,7 @@ public abstract class TelegramWebHookService extends AbsSender implements Webhoo
 
     }
 
-    public abstract void sendToTelegram(ChatMap map, String text);
+    public abstract void sendTelegramMessage(ChatMap map, String text);
 
     @Override
     public Boolean setChatPhoto(SetChatPhoto setChatPhoto) throws TelegramApiException {

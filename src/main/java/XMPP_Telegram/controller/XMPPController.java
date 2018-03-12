@@ -72,12 +72,12 @@ public class XMPPController {
         }
     }
 
-    public void receivedMessage(String server, String login, String contact, String text) {
+    public void receiveXMPPMessage(String server, String login, String contact, String text) {
         XMPPAccount account = accountService.get(server, login);
         messageService.messageFromXMPP(account, contact, text);
     }
 
-    public void sendMessage(ChatMap map, String text) {
+    public void sendXMPPMessage(ChatMap map, String text) {
         for (XMPPConnection connection : connections) {
             if (connection.equalsByXMPPAccount(map.getXmppAccount())) {
                 connection.sendMessage(map, text);

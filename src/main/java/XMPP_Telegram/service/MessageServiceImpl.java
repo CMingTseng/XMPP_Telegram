@@ -32,13 +32,13 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void messageFromXMPP(XMPPAccount account, String contact, String text) {
         ChatMap map = chatMapService.sendToTelegram(account, contact);
-        telegramWebHookService.sendToTelegram(map, text);
+        telegramWebHookService.sendTelegramMessage(map, text);
     }
 
     @Override
     public void messageFromTelegram(TelegramUser user, long chatId, String text) {
         ChatMap map = chatMapService.sendToXMPP(user, chatId);
-        xmppController.sendMessage(map, text);
+        xmppController.sendXMPPMessage(map, text);
     }
 
 

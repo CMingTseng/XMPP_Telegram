@@ -56,6 +56,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
                     sendNotificationAboutWrongMessageType(update);
                 } else if (update.hasMessage()) {
                     LOGGER.info("Message to bot: "+ update.toString());
+                    receiveTelegramMessage(update);
                     // Handle message
                 } else {
                     LOGGER.warn("Update doesn't contains neither ChosenInlineQuery/InlineQuery/CallbackQuery/EditedMessage/Message Update: {}", update);
@@ -67,7 +68,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         return null;
     }
 
-    public void sendToTelegram(ChatMap map, String text) {
+    public void sendTelegramMessage(ChatMap map, String text) {
         SendMessage message = new SendMessage();
         message.setText(text);
         message.setChatId(map.getChatId());
@@ -79,7 +80,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         }
     }
 
-    public void sendFromTelegram(Update update) {
+    public void receiveTelegramMessage(Update update) {
         TelegramUser user = telegramUserService.getById(update.getMessage().getFrom().getId());
         messageService.messageFromTelegram(user, update.getMessage().getChatId(), update.getMessage().getText());
     }

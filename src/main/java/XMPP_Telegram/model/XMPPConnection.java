@@ -129,6 +129,7 @@ public class XMPPConnection {
         message.setBody(text);
         try {
             if (!map.containsKey(chatMap.getXmppContact())) {
+                LOGGER.info("Новый чат!");
                 EntityBareJid to = JidCreate.entityBareFrom(chatMap.getXmppContact() + "@" + server);
                 map.put(chatMap.getXmppContact(), chatManager.chatWith(to));
             }

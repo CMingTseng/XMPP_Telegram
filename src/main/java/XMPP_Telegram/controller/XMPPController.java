@@ -1,5 +1,6 @@
 package XMPP_Telegram.controller;
 
+import XMPP_Telegram.model.ChatMap;
 import XMPP_Telegram.model.TransferMessage;
 import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.model.XMPPConnection;
@@ -51,13 +52,13 @@ public class XMPPController {
     }
 
     public void disconnectAccount(XMPPAccount account) {
-       for (XMPPConnection connection : connections) {
-           if (connection.equalsByXMPPAccount(account)) {
-               connection.close();
-               connections.remove(connection);
-               return;
-           }
-       }
+        for (XMPPConnection connection : connections) {
+            if (connection.equalsByXMPPAccount(account)) {
+                connection.close();
+                connections.remove(connection);
+                return;
+            }
+        }
     }
 
     public void connectAccount(XMPPAccount account) {
@@ -73,7 +74,15 @@ public class XMPPController {
 
     public void receivedMessage(String server, String login, String contact, String text) {
         XMPPAccount account = accountService.get(server, login);
-        messageService.messageFromXMPP(account, contact,text);
+        messageService.messageFromXMPP(account, contact, text);
+    }
 
+    public void sendMessage(ChatMap map, String text) {
+        for (XMPPConnection connection : connections) {
+            if (connection.equalsByXMPPAccount(map.getXmppAccount())) {
+                connection.sendMessage(map, text);
+                return;
+            }
+        }
     }
 }

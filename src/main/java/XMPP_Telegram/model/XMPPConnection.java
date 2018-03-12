@@ -1,6 +1,7 @@
 package XMPP_Telegram.model;
 
 import XMPP_Telegram.controller.XMPPController;
+import XMPP_Telegram.service.TelegramWebHookService;
 import XMPP_Telegram.util.BotUtil;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -15,7 +16,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.net.InetAddress;
@@ -26,6 +31,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class XMPPConnection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
+
     private AbstractXMPPConnection connection = null;
     private XMPPTCPConnectionConfiguration configuration = null;
     private String server;
@@ -111,6 +118,18 @@ public class XMPPConnection {
             connection.disconnect();
     }
 
+    public void sendMessage(ChatMap map, String text) {
+        Message message = new Message();
+        try {
+            message.setType(Message.Type.chat);
+            Jid to = JidCreate.domainBareFrom(map.getXmppContact() + "@" + server);
+            message.setTo(to);
+            connection.sendStanza(message);
+        } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
+            LOGGER.warn("Can't send message to XMPP! " + message.toString());
+        }
+    }
+
     public boolean isConnected() {
         return connection != null && connection.isConnected();
     }
@@ -142,7 +161,7 @@ public class XMPPConnection {
             }
         }};
 
-        protected SSLContext getSslContext() {
+        SSLContext getSslContext() {
             //создаем настройки для работы с TLS
             SSLContext sslContext = null;
             try {
@@ -154,7 +173,7 @@ public class XMPPConnection {
             return sslContext;
         }
 
-        protected HostnameVerifier getHostNameVerifier() {
+        HostnameVerifier getHostNameVerifier() {
             //Создаем настройки для проверки хоста
             return new XmppHostnameVerifier();
         }

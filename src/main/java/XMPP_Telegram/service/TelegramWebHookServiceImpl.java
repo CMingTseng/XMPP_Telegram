@@ -2,6 +2,7 @@ package XMPP_Telegram.service;
 
 import XMPP_Telegram.config.TelegramConfig;
 import XMPP_Telegram.model.ChatMap;
+import XMPP_Telegram.model.TelegramUser;
 import XMPP_Telegram.util.BotUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +23,11 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 public class TelegramWebHookServiceImpl extends TelegramWebHookService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
+    @Autowired
+    private TelegramUserService telegramUserService;
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private TelegramConfig config;
@@ -71,6 +77,11 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         } catch (TelegramApiException e) {
             //TODO
         }
+    }
+
+    public void sendFromTelegram(Update update) {
+        TelegramUser user = telegramUserService.getById(update.getMessage().getFrom().getId());
+        messageService.messageFromTelegram(user, update.getMessage().getChatId(), update.getMessage().getText());
     }
 
     private void sendNotificationAboutWrongMessageType(Update update) {

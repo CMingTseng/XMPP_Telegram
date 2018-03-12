@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
                     .setParameter("xmppAccount", xmppAccount)
                     .setParameter("xmppContact", contact)
                     .getSingleResult();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             LOGGER.warn(String.format("Empty chatmap data for XMPPAccount: %s, contact: %s", xmppAccount.getLogin() + "@" + xmppAccount.getServer(), contact), e);
             return null;
         }
@@ -46,7 +47,7 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
                 .setParameter("telegramUser", telegramUser)
                 .setParameter("chatid", chatId)
                 .getSingleResult();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             LOGGER.warn(String.format("Empty chatmap data for TelegramUser: %s, chatId: %s", telegramUser.getId(), chatId), e);
             return null;
         }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
                 .setParameter("server", server)
                 .setParameter("login", login)
                 .getSingleResult();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             LOGGER.warn(String.format("User not found login: %s, server %s", login, server), e);
             return null;
         }

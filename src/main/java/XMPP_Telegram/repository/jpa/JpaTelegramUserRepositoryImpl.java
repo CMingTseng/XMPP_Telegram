@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
         return entityManager.createNamedQuery(TelegramUser.GET_BY_ID, TelegramUser.class)
                 .setParameter("id", id)
                 .getSingleResult();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
             LOGGER.warn(String.format("User not found %d", id), e);
             return null;
         }

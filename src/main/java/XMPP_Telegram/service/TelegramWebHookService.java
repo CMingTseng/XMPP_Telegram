@@ -1,5 +1,6 @@
 package XMPP_Telegram.service;
 
+import XMPP_Telegram.model.ChatMap;
 import XMPP_Telegram.util.BotUtil;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.groupadministration.SetChatPhoto;
@@ -36,6 +37,8 @@ public abstract class TelegramWebHookService extends AbsSender implements Webhoo
     protected <T extends Serializable, Method extends BotApiMethod<T>, Callback extends SentCallback<T>> void sendApiMethodAsync(Method method, Callback callback) {
 
     }
+
+    public abstract void sendToTelegram(ChatMap map, String text);
 
     @Override
     public Boolean setChatPhoto(SetChatPhoto setChatPhoto) throws TelegramApiException {

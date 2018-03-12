@@ -61,7 +61,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         return null;
     }
 
-    private void sendMessage (ChatMap map, String text) {
+    public void sendToTelegram(ChatMap map, String text) {
         SendMessage message = new SendMessage();
         message.setText(text);
         message.setChatId(map.getChatId());

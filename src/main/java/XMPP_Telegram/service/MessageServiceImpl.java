@@ -16,6 +16,9 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private ChatMapService chatMapService;
 
+    @Autowired
+    private TelegramWebHookService telegramWebHookService;
+
     @Override
     public void create(TransferMessage message) {
         repository.create(message);
@@ -24,6 +27,6 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void messageFromXMPP(XMPPAccount account, String contact, String text) {
         ChatMap map = chatMapService.sendToTelegram(account, contact);
-
+        telegramWebHookService.sendToTelegram(map, text);
     }
 }

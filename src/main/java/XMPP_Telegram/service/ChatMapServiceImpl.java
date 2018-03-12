@@ -27,6 +27,6 @@ public class ChatMapServiceImpl implements ChatMapService {
 
     @Override
     public ChatMap sendToTelegram(XMPPAccount xmppAccount, String contact) {
-        return null;
+        return repository.sendToTelegram(xmppAccount, contact);
     }
 }

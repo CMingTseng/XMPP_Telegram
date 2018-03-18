@@ -55,6 +55,7 @@ public class XMPPAccount {
     private TelegramUser telegramUser;
 
     public XMPPAccount() {
+        port = 5222;
     }
 
     public XMPPAccount(String server, String login, String password) {

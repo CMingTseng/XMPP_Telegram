@@ -6,6 +6,7 @@ import XMPP_Telegram.service.TelegramWebHookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -13,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
+@Transactional(readOnly = true)
 public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
@@ -48,6 +50,7 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
     }
 
     @Override
+    @Transactional
     public TelegramUser create(int id, String username) {
         TelegramUser user = new TelegramUser(id, username);
         entityManager.persist(user);

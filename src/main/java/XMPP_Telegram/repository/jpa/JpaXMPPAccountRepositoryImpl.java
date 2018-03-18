@@ -46,6 +46,7 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     }
 
     @Override
+    @Transactional
     public XMPPAccount update(XMPPAccount account) {
         return entityManager.merge(account);
     }

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
         @NamedQuery(name = ChatMap.SEND_TO_XMPP, query = "SELECT c FROM ChatMap c JOIN FETCH c.telegramUser WHERE c.telegramUser=:telegramUser AND c.chatId=:chatid"),
         @NamedQuery(name = ChatMap.SEND_TO_Telegram, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact"),
-        @NamedQuery(name = ChatMap.GET_BY_USER_ACCOUNT_CONTACT, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount, c.telegramUser WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact AND c.telegramUser=:telegramUser")
+        @NamedQuery(name = ChatMap.GET_BY_USER_ACCOUNT_CONTACT, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount JOIN FETCH c.telegramUser WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact AND c.telegramUser=:telegramUser")
 })
 @Entity
 @Table(name = "telegram_chats", uniqueConstraints = @UniqueConstraint(columnNames = {"chatid", "telegramuser", "xmppaccount", "xmppcontact"}, name = "telegram_chats_index"))

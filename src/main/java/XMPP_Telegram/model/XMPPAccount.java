@@ -19,6 +19,7 @@ public class XMPPAccount {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "server")

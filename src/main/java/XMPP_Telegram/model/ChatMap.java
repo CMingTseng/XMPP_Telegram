@@ -19,7 +19,7 @@ public class ChatMap {
     public static final String GET_BY_USER_ACCOUNT_CONTACT = "ChatMap.getByUserAndAccountAndContact";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(name = "chatid")

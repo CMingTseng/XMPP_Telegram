@@ -1,5 +1,6 @@
 package XMPP_Telegram.service;
 
+import XMPP_Telegram.controller.XMPPController;
 import XMPP_Telegram.model.ChatMap;
 import XMPP_Telegram.model.TelegramUser;
 import XMPP_Telegram.model.XMPPAccount;
@@ -21,6 +22,9 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
     @Autowired
     private ChatMapService chatMapService;
 
+    @Autowired
+    private XMPPController controller;
+
     @Override
     public String useCommand(Update update) {
         String command = update.getMessage().getText().split(" ")[0].toLowerCase();
@@ -31,9 +35,9 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
             String[] args = update.getMessage().getText().split(" ");
             try {
                 if (args.length == 4)
-                    if (addAccount(update.getMessage().getFrom().getId(), args[1], args[2], args[3]))
+                    if (addAccount(update.getMessage().getFrom().getId(), args[1], args[2], args[3])) {
                         return "Аккаунт успешно добавлен";
-                    else return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
+                    } else return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
                 else if (args.length == 5)
                     if (addAccount(update.getMessage().getFrom().getId(), args[1], args[2], args[3], Integer.parseInt(args[4])))
                         return "Аккаунт успешно добавлен";
@@ -81,6 +85,8 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
             return false;
         }
         XMPPAccount account = xmppAccountService.create(telegramUserService.getById(userId), server, login, password, port);
+        if (account != null)
+            controller.connectAccount(account);
         return account != null;
     }
 

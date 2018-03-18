@@ -105,4 +105,27 @@ public class XMPPAccount {
         return telegramUser;
     }
 
+    public void setTelegramUser(TelegramUser telegramUser) {
+        this.telegramUser = telegramUser;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

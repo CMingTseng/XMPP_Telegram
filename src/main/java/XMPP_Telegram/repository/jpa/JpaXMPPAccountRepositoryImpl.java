@@ -30,10 +30,10 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     @Override
     public XMPPAccount get(String server, String login) {
         try {
-        return entityManager.createNamedQuery(XMPPAccount.GET_BY_LOGIN_AND_SERVER, XMPPAccount.class)
-                .setParameter("server", server)
-                .setParameter("login", login)
-                .getSingleResult();
+            return entityManager.createNamedQuery(XMPPAccount.GET_BY_LOGIN_AND_SERVER, XMPPAccount.class)
+                    .setParameter("server", server)
+                    .setParameter("login", login)
+                    .getSingleResult();
         } catch (NoResultException e) {
             LOGGER.warn(String.format("User not found login: %s, server %s", login, server), e);
             return null;
@@ -46,13 +46,14 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     }
 
     @Override
-    public int update(XMPPAccount account, String server, String login, String password, int port) {
-        return 0;
+    public XMPPAccount update(XMPPAccount account) {
+        return entityManager.merge(account);
     }
 
     @Override
-    public void create(String server, String login, String password, int port) {
-
+    @Transactional
+    public void create(XMPPAccount account) {
+        entityManager.persist(account);
     }
 
     @Override

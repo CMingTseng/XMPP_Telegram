@@ -8,14 +8,15 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings("JpaQlInspection")
 @NamedQueries({
         @NamedQuery(name = ChatMap.SEND_TO_XMPP, query = "SELECT c FROM ChatMap c JOIN FETCH c.telegramUser WHERE c.telegramUser=:telegramUser AND c.chatId=:chatid"),
-        @NamedQuery(name = ChatMap.SEND_TO_Telegram, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact")
+        @NamedQuery(name = ChatMap.SEND_TO_Telegram, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact"),
+        @NamedQuery(name = ChatMap.GET_BY_USER_ACCOUNT_CONTACT, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount, c.telegramUser WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact AND c.telegramUser=:telegramUser")
 })
 @Entity
 @Table(name = "telegram_chats", uniqueConstraints = @UniqueConstraint(columnNames = {"chatid", "telegramuser", "xmppaccount", "xmppcontact"}, name = "telegram_chats_index"))
 public class ChatMap {
     public static final String SEND_TO_XMPP = "ChatMap.getByTelegramUserAndChat";
-
     public static final String SEND_TO_Telegram = "ChatMap.getByXMPPAccountAndContact";
+    public static final String GET_BY_USER_ACCOUNT_CONTACT = "ChatMap.getByUserAndAccountAndContact";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,6 +42,15 @@ public class ChatMap {
     @NotBlank
     private String xmppContact;
 
+    public ChatMap() {
+    }
+
+    public ChatMap(@NotNull @NotBlank long chatId, @NotNull TelegramUser telegramUser, @NotNull XMPPAccount xmppAccount, @NotNull @NotBlank String xmppContact) {
+        this.chatId = chatId;
+        this.telegramUser = telegramUser;
+        this.xmppAccount = xmppAccount;
+        this.xmppContact = xmppContact;
+    }
 
     public Long getChatId() {
         return chatId;

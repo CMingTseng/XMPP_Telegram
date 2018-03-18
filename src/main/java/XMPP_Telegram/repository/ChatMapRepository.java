@@ -12,4 +12,10 @@ public interface ChatMapRepository {
     ChatMap sendToXMPP(TelegramUser telegramUser, long chatId);
 
     ChatMap sendToTelegram(XMPPAccount xmppAccount, String contact);
+
+    ChatMap getByUserAndAccountAndContact(TelegramUser user, XMPPAccount account, String contact);
+
+    void create (ChatMap chatMap);
+
+    ChatMap update (ChatMap chatMap);
 }

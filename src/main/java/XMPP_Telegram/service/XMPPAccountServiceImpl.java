@@ -1,5 +1,6 @@
 package XMPP_Telegram.service;
 
+import XMPP_Telegram.model.TelegramUser;
 import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.model.XMPPConnection;
 import XMPP_Telegram.repository.XMPPAccountRepository;
@@ -38,14 +39,25 @@ public class XMPPAccountServiceImpl implements XMPPAccountService {
 
     @Override
     public XMPPAccount update(XMPPAccount account, String server, String login, String password, int port) {
-        repository.update(account, server, login, password, port);
+//        repository.update(account, server, login, password, port);
         return repository.get(server, login);
     }
 
     @Override
-    public XMPPAccount create(String server, String login, String password, int port) {
-        repository.create(server, login, password, port);
-        return get(server, login);
+    public XMPPAccount create(TelegramUser user, String server, String login, String password, int port) {
+        if (repository.get(server, login) == null) {
+            XMPPAccount account = new XMPPAccount(server, login, password, port);
+            account.setTelegramUser(user);
+            repository.create(account);
+            return repository.get(server, login);
+        } else {
+            XMPPAccount account = repository.get(server, login);
+            if (account.getTelegramUser().getId() == user.getId()) {
+                account.setPassword(password);
+                account.setPort(port);
+                return repository.update(account);
+            } else return null;
+        }
     }
 
     @Override

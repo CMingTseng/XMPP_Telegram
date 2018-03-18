@@ -11,9 +11,9 @@ public interface XMPPAccountRepository {
 
     int delete(XMPPAccount account);
 
-    int update(XMPPAccount account, String server, String login, String password, int port);
+    XMPPAccount update(XMPPAccount account);
 
-    void create (String server, String login, String password, int port);
+    void create (XMPPAccount account);
 
     XMPPAccount getById(int id);
 }

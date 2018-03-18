@@ -33,6 +33,9 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
     private TelegramConfig config;
 
     @Autowired
+    private TelegramCommandService telegramCommandService;
+
+    @Autowired
     private void init(TelegramConfig config) throws Exception {
         final WebhookInfo info = getWebhookInfo();
         final String url = info.getUrl();
@@ -75,11 +78,15 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         try {
             sendApiMethod(message);
         } catch (TelegramApiException e) {
-            //TODO
+            LOGGER.error("Failed to send message! %s", text, e);
         }
     }
 
-    public void receiveTelegramMessage(Update update) {
+    private void receiveTelegramMessage(Update update) {
+        if (update.getMessage().getText().matches("^[/].+")){
+            sendBackMessage(update,telegramCommandService.useCommand(update));
+            return;
+        }
         TelegramUser user = telegramUserService.getById(update.getMessage().getFrom().getId());
         messageService.messageFromTelegram(user, update.getMessage().getChatId(), update.getMessage().getText());
     }
@@ -94,6 +101,17 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
             sendApiMethod(message);
         } catch (TelegramApiException e) {
             LOGGER.error("Failed to send message!", message);
+        }
+    }
+
+    private void sendBackMessage (Update update, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(update.getMessage().getChatId());
+        message.setText(text);
+        try {
+            sendApiMethod(message);
+        } catch (TelegramApiException e) {
+            LOGGER.error("Failed to send message! %s", text, e);
         }
     }
 

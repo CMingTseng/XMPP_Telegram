@@ -14,14 +14,19 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     private TelegramUserRepository repository;
 
     @Override
-    public TelegramUser create(int id, String name, int level) {
-        return null;
+    public TelegramUser create(int id, String name) {
+        TelegramUser user = repository.getById(id);
+        if (user == null) {
+            user = repository.create(id, name);
+        }
+        return user;
     }
 
     @Override
     public void update(TelegramUser user) {
 
     }
+
     @Override
     public TelegramUser delete(int id) {
         return null;

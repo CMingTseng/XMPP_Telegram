@@ -20,7 +20,7 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Override
     public List<ChatMap> getAll() {
@@ -43,12 +43,12 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
     @Override
     public ChatMap sendToXMPP(TelegramUser telegramUser, long chatId) {
         try {
-        return entityManager.createNamedQuery(ChatMap.SEND_TO_XMPP, ChatMap.class)
-                .setParameter("telegramUser", telegramUser)
-                .setParameter("chatid", chatId)
-                .getSingleResult();
+            return entityManager.createNamedQuery(ChatMap.SEND_TO_XMPP, ChatMap.class)
+                    .setParameter("telegramUser", telegramUser)
+                    .setParameter("chatid", chatId)
+                    .getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.warn(String.format("Empty chatmap data for TelegramUser: %s, chatId: %s", telegramUser.getId(), chatId), e);
+            LOGGER.warn(String.format("Empty chatmap data for TelegramUser: %s, chatId: %s", telegramUser.getId(), chatId));
             return null;
         }
     }

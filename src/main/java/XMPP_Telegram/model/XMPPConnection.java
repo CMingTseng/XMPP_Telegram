@@ -98,15 +98,6 @@ public class XMPPConnection {
 //                        try {
                         map.put(message.getFrom().asEntityBareJidIfPossible().toString(), chat);
                         controller.receiveXMPPMessage(server, login, message.getFrom().asEntityBareJidIfPossible().toString(), message.getBody());
-//                            IQ iq = new EmptyResultIQ();
-//                            iq.setType(IQ.Type.result);
-//                            iq.setStanzaId(message.getStanzaId());
-//                            iq.setTo(from);
-//                            connection.sendStanza(iq);
-//                        } catch (SmackException.NotConnectedException | InterruptedException e) {
-//                            //TODO
-//                            e.printStackTrace();
-//                        }
                     }
                 }
             });

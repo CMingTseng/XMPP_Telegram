@@ -1,9 +1,9 @@
 package XMPP_Telegram.model;
 
 
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("JpaQlInspection")
@@ -56,10 +56,6 @@ public class XMPPAccount {
     @NotNull
     private TelegramUser telegramUser;
 
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "xmppaccount", nullable = false)
-//    private Set<ChatMap> map;
-
     public XMPPAccount() {
     }
 
@@ -104,10 +100,6 @@ public class XMPPAccount {
     public int getId() {
         return id;
     }
-
-//    public Set<ChatMap> getMap() {
-//        return map;
-//    }
 
     public TelegramUser getTelegramUser() {
         return telegramUser;

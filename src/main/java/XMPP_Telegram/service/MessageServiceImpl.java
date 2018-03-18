@@ -8,7 +8,6 @@ import XMPP_Telegram.model.XMPPAccount;
 import XMPP_Telegram.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -49,6 +48,7 @@ public class MessageServiceImpl implements MessageService {
         ChatMap map = chatMapService.sendToXMPP(user, chatId);
         if (map==null) {
             return;
+            //TODO
         }
         xmppController.sendXMPPMessage(map, text);
     }

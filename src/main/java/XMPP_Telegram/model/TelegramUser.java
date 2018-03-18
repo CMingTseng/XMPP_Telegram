@@ -7,14 +7,13 @@ import java.util.Set;
 @SuppressWarnings("JpaQlInspection")
 @NamedQueries({
         @NamedQuery(name = TelegramUser.ALL, query = "SELECT t FROM TelegramUser t"),
-        @NamedQuery(name = TelegramUser.GET_BY_ID, query = "SELECT t FROM TelegramUser t WHERE t.id=:id")
+        @NamedQuery(name = TelegramUser.GET_BY_ID, query = "SELECT t FROM TelegramUser t WHERE t.id=:id"),
 })
 @Entity
 @Table(name = "telegram_users")
 public class TelegramUser {
     public static final String ALL = "TelegramUser.getAllConnections";
     public static final String GET_BY_ID = "TelegramUser.getById";
-
 
     @Id
     private Integer id;
@@ -24,6 +23,14 @@ public class TelegramUser {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "telegramUser", cascade = CascadeType.ALL)
     private Set<XMPPAccount> accounts = new HashSet<>();
+
+    public TelegramUser() {
+    }
+
+    public TelegramUser(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public int getId() {
         return id;
@@ -44,24 +51,4 @@ public class TelegramUser {
     public Set<XMPPAccount> getAccounts() {
         return accounts;
     }
-
-    //    public Set<XMPPAccount> getAccounts() {
-//        return accounts;
-//    }
-//
-//    public void addAccount(XMPPAccount account) {
-//        accounts.add(account);
-//    }
-//
-//    public XMPPAccount getAccountById(int id) {
-//        for (XMPPAccount account : accounts) {
-//            if (account.getId() == id)
-//                return account;
-//        }
-//        return null;
-//    }
-//
-//    public void deleteAccount(XMPPAccount account) {
-//        accounts.remove(account);
-//    }
 }

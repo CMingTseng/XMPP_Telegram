@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TelegramUserService {
 
-    TelegramUser create(int id, String name, int level);
+    TelegramUser create(int id, String name);
 
     void update(TelegramUser user);
 

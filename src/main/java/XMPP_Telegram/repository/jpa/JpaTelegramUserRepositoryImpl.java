@@ -28,11 +28,11 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
     @Override
     public TelegramUser getById(int id) {
         try {
-        return entityManager.createNamedQuery(TelegramUser.GET_BY_ID, TelegramUser.class)
-                .setParameter("id", id)
-                .getSingleResult();
+            return entityManager.createNamedQuery(TelegramUser.GET_BY_ID, TelegramUser.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.warn(String.format("User not found %d", id), e);
+            LOGGER.warn(String.format("User not found %d", id));
             return null;
         }
     }
@@ -48,7 +48,9 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
     }
 
     @Override
-    public void create(int id, String username) {
-
+    public TelegramUser create(int id, String username) {
+        TelegramUser user = new TelegramUser(id, username);
+        entityManager.persist(user);
+        return user;
     }
 }

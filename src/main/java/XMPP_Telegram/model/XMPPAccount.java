@@ -39,7 +39,6 @@ public class XMPPAccount {
 
     @Column(name = "port", columnDefinition = "5222")
     @NotNull
-    @NotBlank
     private int port;
 
     @Column(name = "savehistory", columnDefinition = "1")
@@ -55,7 +54,6 @@ public class XMPPAccount {
     private TelegramUser telegramUser;
 
     public XMPPAccount() {
-        port = 5222;
     }
 
     public XMPPAccount(String server, String login, String password) {

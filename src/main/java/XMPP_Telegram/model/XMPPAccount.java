@@ -44,13 +44,10 @@ public class XMPPAccount {
 
     @Column(name = "savehistory", columnDefinition = "1")
     @NotNull
-    @NotBlank
-    private boolean saveHistory;
+    private boolean saveHistory = true;
 
     @Column(name = "active", columnDefinition = "1")
-    @NotNull
-    @NotBlank
-    private boolean active;
+    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "telegramuser", nullable = false)

@@ -40,7 +40,7 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
                     else return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
                 else return "Команда не распознана";
             } catch (Exception e) {
-                LOGGER.warn("Аргументы команды /addaccount не распознаны!");
+                LOGGER.warn("Аргументы команды /addaccount не распознаны!", e);
                 return "Команда не распознана";
             }
         } else if (command.equals("/addgroup")) {

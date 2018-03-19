@@ -24,12 +24,10 @@ public class ChatMap {
 
     @Column(name = "chatid")
     @NotNull
-    @NotBlank
     private long chatId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "telegramuser", nullable = false)
-    @NotNull
     private TelegramUser telegramUser;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -39,7 +37,6 @@ public class ChatMap {
 
     @Column(name = "xmppcontact")
     @NotNull
-    @NotBlank
     private String xmppContact;
 
     public ChatMap() {

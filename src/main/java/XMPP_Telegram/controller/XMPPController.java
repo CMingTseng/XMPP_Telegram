@@ -68,6 +68,12 @@ public class XMPPController {
     public void connectAccount(XMPPAccount account) {
         XMPPConnection connection = new XMPPConnection(account);
         connection.setController(this);
+        for (XMPPConnection temp : connections) {
+            if (temp.equalsByXMPPAccount(account)) {
+                connections.remove(temp);
+                break;
+            }
+        }
         connections.add(connection);
         try {
             connection.createConnection();

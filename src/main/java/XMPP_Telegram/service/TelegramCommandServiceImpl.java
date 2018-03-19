@@ -57,7 +57,7 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
                     XMPPAccount account = xmppAccountService.get(args[1].split("@")[1], args[1].split("@")[0]);
                     if (account == null)
                         return "XMPP-аккаунт не зарегистрирован для данного пользователя. Добавьте аккаунт командой /addaccount";
-                    if (addGroup(user, update.getMessage().getChatId(), account, args[2]))
+                    if (addGroup(user, update.getMessage().getChat().getId(), account, args[2]))
                         return "Группа успешно добавлена";
                     else return "Ошибка заведения группы!";
                 } else return "Команда не распознана!";

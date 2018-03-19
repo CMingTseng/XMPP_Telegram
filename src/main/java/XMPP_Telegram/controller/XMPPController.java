@@ -37,11 +37,7 @@ public class XMPPController {
             for (XMPPConnection connection : connections) {
                 connection.setController(this);
                 if (!connection.isConnected())
-                    try {
-                        connection.start();
-                    } catch (Exception e) {
-                        //TODO
-                    }
+                    new Thread(connection).start();
             }
         }
     }
@@ -76,7 +72,7 @@ public class XMPPController {
             }
         }
         connections.add(connection);
-        connection.start();
+        new Thread(connection).start();
     }
 
     public void receiveXMPPMessage(String server, String login, String contact, String text) {

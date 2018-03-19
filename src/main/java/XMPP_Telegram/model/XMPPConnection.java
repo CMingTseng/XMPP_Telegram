@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMPPConnection extends Thread {
+public class XMPPConnection implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
     private AbstractXMPPConnection connection = null;
@@ -84,7 +84,7 @@ public class XMPPConnection extends Thread {
     /*
      *Создание подключения
      */
-    public void createConnection() throws Exception {
+    private void createConnection() throws Exception {
         try {
             configure();
             connect();
@@ -112,7 +112,6 @@ public class XMPPConnection extends Thread {
             chatManager.removeListener(listener);
         if (connection.isConnected())
             connection.disconnect();
-        this.interrupt();
     }
 
     public void sendMessage(ChatMap chatMap, String text) {
@@ -139,8 +138,7 @@ public class XMPPConnection extends Thread {
     }
 
     @Override
-    public synchronized void start() {
-        super.start();
+    public synchronized void run() {
         try {
             createConnection();
         } catch (Exception e) {

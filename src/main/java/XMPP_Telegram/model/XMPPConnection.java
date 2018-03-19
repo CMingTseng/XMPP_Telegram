@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMPPConnection {
+public class XMPPConnection extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(TelegramWebHookService.class);
 
     private AbstractXMPPConnection connection = null;
@@ -112,6 +112,7 @@ public class XMPPConnection {
             chatManager.removeListener(listener);
         if (connection.isConnected())
             connection.disconnect();
+        this.interrupt();
     }
 
     public void sendMessage(ChatMap chatMap, String text) {
@@ -135,6 +136,16 @@ public class XMPPConnection {
 
     public boolean equalsByXMPPAccount(XMPPAccount account) {
         return login.equals(account.getLogin()) && server.equals(account.getServer());
+    }
+
+    @Override
+    public synchronized void start() {
+        super.start();
+        try {
+            createConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public AbstractXMPPConnection getConnection() {

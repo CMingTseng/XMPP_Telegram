@@ -89,8 +89,8 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
             return false;
         }
         XMPPAccount account = xmppAccountService.create(telegramUserService.getById(userId), server, login, password, port);
-//        if (account != null)
-//            controller.connectAccount(account);
+        if (account != null)
+            controller.connectAccount(account);
         return account != null;
     }
 

@@ -51,7 +51,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
 
     //    XMPP support nothing except text messages. All another message's type back notification
     @Override
-    public BotApiMethod onWebhookUpdateReceived(Update update) {
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         if (update != null) {
             try {
                 if (update.hasChosenInlineQuery() || update.hasInlineQuery() || update.hasCallbackQuery() || update.hasEditedMessage()) {
@@ -84,7 +84,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
 
     private void receiveTelegramMessage(Update update) {
         if (update.getMessage().getText().matches("^[/].+")){
-            sendBackMessage(update,telegramCommandService.useCommand(update));
+            sendBackMessage(update,telegramCommandService.useCommand(update), true);
             return;
         }
         TelegramUser user = telegramUserService.getById(update.getMessage().getFrom().getId());
@@ -104,10 +104,12 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         }
     }
 
-    private void sendBackMessage (Update update, String text) {
+    private void sendBackMessage (Update update, String text, boolean replyToMessage) {
         SendMessage message = new SendMessage();
         message.setChatId(update.getMessage().getChatId());
         message.setText(text);
+        if (replyToMessage)
+            message.setReplyToMessageId(update.getMessage().getMessageId());
         try {
             sendApiMethod(message);
         } catch (TelegramApiException e) {

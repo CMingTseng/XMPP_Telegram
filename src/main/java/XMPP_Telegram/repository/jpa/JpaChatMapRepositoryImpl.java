@@ -48,7 +48,7 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
             return entityManager.createNamedQuery(ChatMap.GET_BY_USER_ACCOUNT_CONTACT, ChatMap.class)
                     .setParameter("xmppAccount", account)
                     .setParameter("telegramUser", user)
-                    .setParameter("contact", contact)
+                    .setParameter("xmppContact", contact)
                     .getSingleResult();
         }catch (NoResultException e) {
             LOGGER.warn(String.format("Empty chatmap data for XMPPAccount: %s, TelegramUser: %s, contact: %s", account.getLogin() + "@" +account.getServer(), user.getId(), contact), e);

@@ -16,12 +16,9 @@ public class RESTController {
     @Autowired
     private XMPPController xmppController;
 
-    @Autowired
-    private ChatMapService mapService;
-
     @RequestMapping("/")
-    public String test() {
-        return "test";
+    public int test() {
+        return Thread.activeCount();
     }
 
     @RequestMapping("/secured")

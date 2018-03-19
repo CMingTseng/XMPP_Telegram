@@ -112,6 +112,7 @@ public class XMPPConnection implements Runnable {
             chatManager.removeListener(listener);
         if (connection.isConnected())
             connection.disconnect();
+        Thread.currentThread().interrupt();
     }
 
     public void sendMessage(ChatMap chatMap, String text) {

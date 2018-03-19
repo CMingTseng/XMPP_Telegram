@@ -62,7 +62,7 @@ public class TelegramCommandServiceImpl implements TelegramCommandService {
                     else return "Ошибка заведения группы!";
                 } else return "Команда не распознана!";
             } catch (Exception e) {
-                LOGGER.warn("Аргументы команды /addgroup не распознаны!");
+                LOGGER.warn("Аргументы команды /addgroup не распознаны!", e);
                 return "Команда не распознана";
             }
         }

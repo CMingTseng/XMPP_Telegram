@@ -58,7 +58,7 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
                     // Wrong message type
                     sendNotificationAboutWrongMessageType(update);
                 } else if (update.hasMessage()) {
-                    LOGGER.info("Message to bot: "+ update.toString());
+                    LOGGER.info("Message to bot: " + update.toString());
                     receiveTelegramMessage(update);
                     // Handle message
                 } else {
@@ -83,8 +83,8 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
     }
 
     private void receiveTelegramMessage(Update update) {
-        if (update.getMessage().getText().matches("^[/].+")){
-            sendBackMessage(update,telegramCommandService.useCommand(update), true);
+        if (update.getMessage().getText().matches("^[/].+")) {
+            sendBackMessage(update, telegramCommandService.useCommand(update));
             return;
         }
         TelegramUser user = telegramUserService.getById(update.getMessage().getFrom().getId());
@@ -104,12 +104,10 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         }
     }
 
-    private void sendBackMessage (Update update, String text, boolean replyToMessage) {
+    private void sendBackMessage(Update update, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(update.getMessage().getChatId());
         message.setText(text);
-        if (replyToMessage)
-            message.setReplyToMessageId(update.getMessage().getMessageId());
         try {
             sendApiMethod(message);
         } catch (TelegramApiException e) {

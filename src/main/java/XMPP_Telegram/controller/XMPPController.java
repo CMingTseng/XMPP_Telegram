@@ -70,6 +70,7 @@ public class XMPPController {
         connection.setController(this);
         for (XMPPConnection temp : connections) {
             if (temp.equalsByXMPPAccount(account)) {
+                temp.close();
                 connections.remove(temp);
                 break;
             }

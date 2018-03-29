@@ -9,14 +9,14 @@ import javax.validation.constraints.NotNull;
 @NamedQueries({
         @NamedQuery(name = ChatMap.SEND_TO_XMPP, query = "SELECT c FROM ChatMap c JOIN FETCH c.telegramUser WHERE c.telegramUser=:telegramUser AND c.chatId=:chatid"),
         @NamedQuery(name = ChatMap.SEND_TO_Telegram, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact"),
-        @NamedQuery(name = ChatMap.GET_BY_USER_ACCOUNT_CONTACT, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount JOIN FETCH c.telegramUser WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact AND c.telegramUser=:telegramUser")
+        @NamedQuery(name = ChatMap.GET_BY_ACCOUNT_CONTACT, query = "SELECT c FROM ChatMap c JOIN FETCH c.xmppAccount WHERE c.xmppAccount=:xmppAccount AND c.xmppContact=:xmppContact")
 })
 @Entity
-@Table(name = "telegram_chats", uniqueConstraints = @UniqueConstraint(columnNames = {"chatid", "telegramuser", "xmppaccount", "xmppcontact"}, name = "telegram_chats_index"))
+@Table(name = "telegram_chats", uniqueConstraints = @UniqueConstraint(columnNames = {"chatid", "xmppaccount", "xmppcontact"}, name = "telegram_chats_index"))
 public class ChatMap {
     public static final String SEND_TO_XMPP = "ChatMap.getByTelegramUserAndChat";
     public static final String SEND_TO_Telegram = "ChatMap.getByXMPPAccountAndContact";
-    public static final String GET_BY_USER_ACCOUNT_CONTACT = "ChatMap.getByUserAndAccountAndContact";
+    public static final String GET_BY_ACCOUNT_CONTACT = "ChatMap.getByAccountAndContact";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,10 +25,6 @@ public class ChatMap {
     @Column(name = "chatid")
     @NotNull
     private long chatId;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "telegramuser", nullable = false)
-    private TelegramUser telegramUser;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "xmppaccount", nullable = false)
@@ -42,19 +38,14 @@ public class ChatMap {
     public ChatMap() {
     }
 
-    public ChatMap(@NotNull @NotBlank long chatId, @NotNull TelegramUser telegramUser, @NotNull XMPPAccount xmppAccount, @NotNull @NotBlank String xmppContact) {
+    public ChatMap(@NotNull @NotBlank long chatId, @NotNull XMPPAccount xmppAccount, @NotNull @NotBlank String xmppContact) {
         this.chatId = chatId;
-        this.telegramUser = telegramUser;
         this.xmppAccount = xmppAccount;
         this.xmppContact = xmppContact;
     }
 
     public Long getChatId() {
         return chatId;
-    }
-
-    public TelegramUser getTelegramUser() {
-        return telegramUser;
     }
 
     public XMPPAccount getXmppAccount() {
@@ -67,10 +58,6 @@ public class ChatMap {
 
     public void setChatId(long chatId) {
         this.chatId = chatId;
-    }
-
-    public void setTelegramUser(TelegramUser telegramUser) {
-        this.telegramUser = telegramUser;
     }
 
     public void setXmppAccount(XMPPAccount xmppAccount) {
@@ -86,7 +73,6 @@ public class ChatMap {
         return "ChatMap{" +
                 "id=" + id +
                 ", chatId=" + chatId +
-                ", telegramUser=" + telegramUser +
                 ", xmppAccount=" + xmppAccount +
                 ", xmppContact='" + xmppContact + '\'' +
                 '}';

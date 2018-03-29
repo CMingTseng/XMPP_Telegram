@@ -10,26 +10,33 @@ import java.util.List;
 @Service
 public class TelegramUserServiceImpl implements TelegramUserService {
 
+    private final TelegramUserRepository repository;
+
     @Autowired
-    private TelegramUserRepository repository;
-
-    @Override
-    public TelegramUser create(int id, String name) {
-        TelegramUser user = repository.getById(id);
-        if (user == null) {
-            user = repository.create(id, name);
-        }
-        return user;
+    public TelegramUserServiceImpl(TelegramUserRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public void update(TelegramUser user) {
-
+    public boolean create(int id, String name) {
+        if (getById(id) == null) {
+            try {
+                repository.create(id, name);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        } else return false;
     }
 
     @Override
-    public TelegramUser delete(int id) {
+    public TelegramUser update(TelegramUser user) {
         return null;
+    }
+
+    @Override
+    public boolean delete(int id) {
+        return false;
     }
 
     @Override

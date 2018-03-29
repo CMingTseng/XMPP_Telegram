@@ -7,11 +7,11 @@ import org.telegram.telegrambots.api.objects.Update;
 public interface TelegramCommandService {
     String useCommand (Update update);
 
-    void start (int id, String login);
+    String start (int id, String login);
 
-    boolean addAccount (int userId, String server, String login, String password);
+    String addAccount (int userId, String server, String login, String password);
 
-    boolean addAccount (int userId, String server, String login, String password, int port);
+    String addAccount (int userId, String server, String login, String password, int port);
 
-    boolean addGroup (TelegramUser user, long chatId, XMPPAccount account, String contact);
+    String addGroup (int userId, long chatId, String server, String login, String contact);
 }

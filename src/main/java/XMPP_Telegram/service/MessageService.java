@@ -9,5 +9,5 @@ public interface MessageService {
 
     void messageFromXMPP(XMPPAccount account, String contact, String text);
 
-    void messageFromTelegram(TelegramUser user, long chatId, String text);
+    void messageFromTelegram(long chatId, String text);
 }

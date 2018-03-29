@@ -16,7 +16,7 @@ public interface XMPPAccountService {
 
     XMPPAccount update(XMPPAccount account, String server, String login, String password, int port);
 
-    XMPPAccount create(TelegramUser user, String server, String login, String password, int port);
+    boolean create(TelegramUser user, String server, String login, String password, int port);
 
     XMPPAccount getById(int id);
 

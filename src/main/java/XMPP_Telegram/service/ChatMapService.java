@@ -13,7 +13,7 @@ public interface ChatMapService {
 
     ChatMap sendToTelegram(XMPPAccount xmppAccount, String contact);
 
-    ChatMap create(TelegramUser user, XMPPAccount account, long chatId, String contact);
+    ChatMap create(XMPPAccount account, long chatId, String contact);
 
-    ChatMap getByUserAndAccountAndContact(TelegramUser user, XMPPAccount account, String contact);
+    ChatMap getByAccountAndContact(XMPPAccount account, String contact);
 }

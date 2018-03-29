@@ -5,8 +5,9 @@ DROP TABLE IF EXISTS telegram_users;
 
 CREATE TABLE telegram_users
 (
-  `id`       INT NOT NULL,
-  `username` VARCHAR(250),
+  `id`          INT NOT NULL,
+  `username`    VARCHAR(250),
+  `defaultchat` INT,
   PRIMARY KEY (`id`)
 );
 
@@ -28,44 +29,13 @@ CREATE TABLE xmpp_accounts
 CREATE UNIQUE INDEX xmpp_accounts_login_server_index
   ON xmpp_accounts (login, server);
 
-CREATE TABLE messages
-(
-  `id`          BIGINT               NOT NULL AUTO_INCREMENT,
-  `text`        TEXT,
-  `xmppaccount` INT                  NOT NULL,
-  `contact`     VARCHAR(250)         NOT NULL,
-  `fromXMPP`    TINYINT(1) DEFAULT 0 NOT NULL,
-  `isSent`      TINYINT(1) DEFAULT 0 NOT NULL,
-  `date`        TIMESTAMP,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (xmppaccount) REFERENCES xmpp_accounts (id)
-    ON UPDATE RESTRICT
-    ON DELETE CASCADE
-);
-CREATE INDEX messages_xmppaccount_index
-  ON messages (xmppaccount);
-CREATE INDEX messages_xmppaccount_contact_index
-  ON messages (xmppaccount, contact);
-CREATE INDEX messages_xmppaccount_contact_dtinput_index
-  ON messages (xmppaccount, contact, date);
-CREATE INDEX messages_issended_index
-  ON messages (isSent);
-CREATE INDEX messages_dtinput_index
-  ON messages (date);
-CREATE INDEX messages_issended_dtinput
-  ON messages (isSent, date);
-
 CREATE TABLE telegram_chats
 (
-  `id`           INT          NOT NULL AUTO_INCREMENT,
-  `chatid`       BIGINT       NOT NULL,
-  `telegramuser` INT          NOT NULL,
-  `xmppaccount`  INT          NOT NULL,
-  `xmppcontact`  VARCHAR(250) NOT NULL,
+  `id`          INT          NOT NULL AUTO_INCREMENT,
+  `chatid`      BIGINT       NOT NULL,
+  `xmppaccount` INT          NOT NULL,
+  `xmppcontact` VARCHAR(250) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (telegramuser) REFERENCES telegram_users (id)
-    ON UPDATE RESTRICT
-    ON DELETE CASCADE,
   FOREIGN KEY (xmppaccount) REFERENCES xmpp_accounts (id)
     ON UPDATE RESTRICT
     ON DELETE CASCADE
@@ -73,8 +43,22 @@ CREATE TABLE telegram_chats
 CREATE UNIQUE INDEX telegram_chats_chatid_index
   ON telegram_chats (chatid);
 CREATE UNIQUE INDEX telegram_chats_index
-  ON telegram_chats (chatid, telegramuser, xmppaccount, xmppcontact);
+  ON telegram_chats (chatid, xmppaccount, xmppcontact);
 
+CREATE TABLE messages
+(
+  `id`       BIGINT               NOT NULL AUTO_INCREMENT,
+  `text`     TEXT,
+  `chatmap`  INT                  NOT NULL,
+  `fromXMPP` TINYINT(1) DEFAULT 0 NOT NULL,
+  `date`     TIMESTAMP            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (chatmap) REFERENCES telegram_chats (id)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+);
+CREATE INDEX messages_dtinput_index
+  ON messages (date);
 
 #
 # DELETE FROM xmpp_accounts;
@@ -82,6 +66,6 @@ CREATE UNIQUE INDEX telegram_chats_index
 
 
 # INSERT INTO telegram_users (id, username) VALUES (625605,'Lezenford');
-# INSERT INTO xmpp_accounts (login, password, server, savehistory, telegramuser) VALUES ('testjava', '12345678', 'ifox.pro',1,625605);
+# INSERT INTO xmpp_accounts (login, password, server, savehistory, telegramuser) VALUES ('support812', 'Non329nv', 'ifox.pro',1,625605);
 # INSERT INTO telegram_chats (chatid, telegramuser, xmppaccount, xmppcontact) VALUES ('-301274558',625605,1,'support812@ifox.pro')
 # INSERT INTO xmpp_accounts (login, password, server) VALUES ('testjava2', '12345678', 'ifox.pro');

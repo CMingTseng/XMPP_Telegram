@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface TelegramUserService {
 
-    TelegramUser create(int id, String name);
+    boolean create(int id, String name);
 
-    void update(TelegramUser user);
+    TelegramUser update(TelegramUser user);
 
-    TelegramUser delete(int id);
+    boolean delete(int id);
 
     TelegramUser getById(int id);
 

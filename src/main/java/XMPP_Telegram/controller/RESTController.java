@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.objects.Update;
 
+import java.util.Map;
+
 @RestController
 public class RESTController {
 
@@ -17,8 +19,12 @@ public class RESTController {
     private XMPPController xmppController;
 
     @RequestMapping("/")
-    public int test() {
-        return Thread.activeCount();
+    public String test() {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Thread,StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()){
+            sb.append(entry.getKey().getName()).append(" ").append(entry.getKey().getState()).append(System.lineSeparator());
+        }
+        return sb.toString();
     }
 
     @RequestMapping("/secured")

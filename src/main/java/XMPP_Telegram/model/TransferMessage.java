@@ -2,40 +2,45 @@ package XMPP_Telegram.model;
 
 import org.jivesoftware.smack.packet.Message;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+@SuppressWarnings("JpaQlInspection")
+@Entity
+@Table(name = "messages", uniqueConstraints = @UniqueConstraint(columnNames = "date", name = "messages_dtinput_index"))
 public class TransferMessage {
 
-    private long id = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
+    @Column(name = "text")
+    @NotNull
     private String text;
 
-    private XMPPAccount xmppAccount;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chatmap", nullable = false)
+    private ChatMap chatMap;
 
-    private TelegramUser telegramUser;
-
-    private String contact;
-
-    private long chatId;
-
+    @Column(name = "fromXMPP", nullable = false)
+    @NotNull
     private boolean fromXMPP;
 
-    private boolean sent = false;
-
+    @Column(name = "date")
     private Date date;
 
     public TransferMessage() {
     }
 
-    public TransferMessage(Message message, XMPPAccount xmppAccount) {
-        this.text = message.getBody();
-        this.xmppAccount = xmppAccount;
-        this.contact = message.getFrom().asBareJid().toString();
-        date = new Date();
-        fromXMPP = true;
+    public ChatMap getChatMap() {
+        return chatMap;
     }
 
-
+    public void setChatMap(ChatMap chatMap) {
+        this.chatMap = chatMap;
+    }
 
     public long getId() {
         return id;
@@ -51,22 +56,6 @@ public class TransferMessage {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public XMPPAccount getXmppAccount() {
-        return xmppAccount;
-    }
-
-    public void setXmppAccount(XMPPAccount xmppAccount) {
-        this.xmppAccount = xmppAccount;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
     }
 
     public Date getDate() {
@@ -85,39 +74,12 @@ public class TransferMessage {
         this.fromXMPP = fromXMPP;
     }
 
-    public boolean isSent() {
-        return sent;
-    }
-
-    public void setSent(boolean sent) {
-        this.sent = sent;
-    }
-
-    public TelegramUser getTelegramUser() {
-        return telegramUser;
-    }
-
-    public void setTelegramUser(TelegramUser telegramUser) {
-        this.telegramUser = telegramUser;
-    }
-
-    public long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
-    }
-
     @Override
     public String toString() {
         return "TransferMessage{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", xmppAccount=" + xmppAccount +
-                ", contact='" + contact + '\'' +
                 ", fromXMPP=" + fromXMPP +
-                ", sent=" + sent +
                 ", date=" + date +
                 '}';
     }

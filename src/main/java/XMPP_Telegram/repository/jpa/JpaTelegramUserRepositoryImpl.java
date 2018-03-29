@@ -51,9 +51,13 @@ public class JpaTelegramUserRepositoryImpl implements TelegramUserRepository {
 
     @Override
     @Transactional
-    public TelegramUser create(int id, String username) {
-        TelegramUser user = new TelegramUser(id, username);
-        entityManager.persist(user);
-        return user;
+    public void create(int id, String username) throws Exception {
+        try {
+            TelegramUser user = new TelegramUser(id, username);
+            entityManager.persist(user);
+        } catch (Exception e) {
+            LOGGER.error(String.format("Ошибка заведения пользователя Telegram в БД! id: %d, username: %s", id, username), e);
+            throw e;
+        }
     }
 }

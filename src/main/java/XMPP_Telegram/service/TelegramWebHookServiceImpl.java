@@ -49,14 +49,14 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         }
     }
 
-    //    XMPP support nothing except text messages. All another message's type back notification
+    //    XMPP support only text messages. All another message's type back notification
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         if (update != null) {
             try {
                 if (update.hasChosenInlineQuery() || update.hasInlineQuery() || update.hasCallbackQuery() || update.hasEditedMessage()) {
                     // Wrong message type
-                    sendNotificationAboutWrongMessageType(update);
+                    LOGGER.warn("MessageType doesn't support. Message: %s", update.toString());
                 } else if (update.hasMessage()) {
                     LOGGER.info("Message to bot: " + update.toString());
                     receiveTelegramMessage(update);
@@ -91,18 +91,18 @@ public class TelegramWebHookServiceImpl extends TelegramWebHookService {
         messageService.messageFromTelegram(user, update.getMessage().getChatId(), update.getMessage().getText());
     }
 
-    private void sendNotificationAboutWrongMessageType(Update update) {
-        LOGGER.info("Wrong message: " + update.toString());
-        SendMessage message = new SendMessage();
-        message.setText("Данный запрос не поддерживается ботом!");
-        message.setReplyToMessageId(update.getMessage().getMessageId());
-        try {
-            LOGGER.info("Message type is not supported!", update);
-            sendApiMethod(message);
-        } catch (TelegramApiException e) {
-            LOGGER.error("Failed to send message!", message);
-        }
-    }
+//    private void sendNotificationAboutWrongMessageType(Update update) {
+//        LOGGER.info("Wrong message: " + update.toString());
+//        SendMessage message = new SendMessage();
+//        message.setText("Данный запрос не поддерживается ботом!");
+//        message.setReplyToMessageId(update.getMessage().getMessageId());
+//        try {
+//            LOGGER.info("Message type is not supported!", update);
+//            sendApiMethod(message);
+//        } catch (TelegramApiException e) {
+//            LOGGER.error("Failed to send message!", message);
+//        }
+//    }
 
     private void sendBackMessage(Update update, String text) {
         SendMessage message = new SendMessage();

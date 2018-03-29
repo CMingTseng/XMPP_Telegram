@@ -18,8 +18,11 @@ public class TelegramUser {
     @Id
     private Integer id;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = true)
     private String name;
+
+    @Column(name = "defaultchat")
+    private long defaultChat;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "telegramUser", cascade = CascadeType.ALL)
     private Set<XMPPAccount> accounts = new HashSet<>();
@@ -27,9 +30,16 @@ public class TelegramUser {
     public TelegramUser() {
     }
 
+    public TelegramUser(Integer id, String name, long defaultChat) {
+        this.id = id;
+        this.name = name;
+        this.defaultChat = defaultChat;
+    }
+
     public TelegramUser(Integer id, String name) {
         this.id = id;
         this.name = name;
+        defaultChat = id;
     }
 
     public int getId() {
@@ -50,5 +60,13 @@ public class TelegramUser {
 
     public Set<XMPPAccount> getAccounts() {
         return accounts;
+    }
+
+    public long getDefaultChat() {
+        return defaultChat;
+    }
+
+    public void setDefaultChat(long defaultChat) {
+        this.defaultChat = defaultChat;
     }
 }

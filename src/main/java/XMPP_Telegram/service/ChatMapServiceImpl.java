@@ -12,8 +12,12 @@ import java.util.List;
 @Service
 public class ChatMapServiceImpl implements ChatMapService {
 
+    private final ChatMapRepository repository;
+
     @Autowired
-    private ChatMapRepository repository;
+    public ChatMapServiceImpl(ChatMapRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public List<ChatMap> getAll() {
@@ -31,20 +35,20 @@ public class ChatMapServiceImpl implements ChatMapService {
     }
 
     @Override
-    public ChatMap create(TelegramUser user, XMPPAccount account, long chatId, String contact) {
-        if (getByUserAndAccountAndContact(user, account, contact) == null) {
-            ChatMap map = new ChatMap(chatId, user, account, contact);
+    public ChatMap create(XMPPAccount account, long chatId, String contact) {
+        if (getByAccountAndContact(account, contact) == null) {
+            ChatMap map = new ChatMap(chatId, account, contact);
             repository.create(map);
         } else {
-            ChatMap map = getByUserAndAccountAndContact(user, account, contact);
+            ChatMap map = getByAccountAndContact(account, contact);
             map.setChatId(chatId);
             repository.update(map);
         }
-        return repository.getByUserAndAccountAndContact(user, account,contact);
+        return repository.getByUserAndAccountAndContact(account,contact);
     }
 
     @Override
-    public ChatMap getByUserAndAccountAndContact(TelegramUser user, XMPPAccount account, String contact) {
-        return repository.getByUserAndAccountAndContact(user, account,contact);
+    public ChatMap getByAccountAndContact(XMPPAccount account, String contact) {
+        return repository.getByUserAndAccountAndContact(account,contact);
     }
 }

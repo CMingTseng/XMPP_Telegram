@@ -30,7 +30,7 @@ public class XMPPController {
         this.accountService = accountService;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void start() {
         if (connections == null) {
             connections = accountService.getAllConnections();

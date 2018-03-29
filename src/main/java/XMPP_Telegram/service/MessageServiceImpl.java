@@ -36,7 +36,6 @@ public class MessageServiceImpl implements MessageService {
             map = new ChatMap();
             map.setXmppContact(contact);
             map.setXmppAccount(account);
-            map.setTelegramUser(account.getTelegramUser());
             map.setChatId(account.getTelegramUser().getId());
             text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
         }

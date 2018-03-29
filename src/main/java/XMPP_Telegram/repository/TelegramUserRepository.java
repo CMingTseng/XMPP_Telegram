@@ -13,7 +13,7 @@ public interface TelegramUserRepository {
 
     int update(TelegramUser user, String name);
 
-    TelegramUser create (int id, String username);
+    void create (int id, String username) throws Exception;
 
 
 }

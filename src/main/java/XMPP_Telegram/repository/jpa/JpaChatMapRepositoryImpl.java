@@ -7,7 +7,6 @@ import XMPP_Telegram.repository.ChatMapRepository;
 import XMPP_Telegram.service.TelegramWebHookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,15 +42,14 @@ public class JpaChatMapRepositoryImpl implements ChatMapRepository {
     }
 
     @Override
-    public ChatMap getByUserAndAccountAndContact(TelegramUser user, XMPPAccount account, String contact) {
+    public ChatMap getByUserAndAccountAndContact(XMPPAccount account, String contact) {
         try {
-            return entityManager.createNamedQuery(ChatMap.GET_BY_USER_ACCOUNT_CONTACT, ChatMap.class)
+            return entityManager.createNamedQuery(ChatMap.GET_BY_ACCOUNT_CONTACT, ChatMap.class)
                     .setParameter("xmppAccount", account)
-                    .setParameter("telegramUser", user)
                     .setParameter("xmppContact", contact)
                     .getSingleResult();
         }catch (NoResultException e) {
-            LOGGER.warn(String.format("Empty chatmap data for XMPPAccount: %s, TelegramUser: %s, contact: %s", account.getLogin() + "@" +account.getServer(), user.getId(), contact), e);
+            LOGGER.warn(String.format("Empty chatmap data for XMPPAccount: %s, contact: %s", account.getLogin() + "@" +account.getServer(), contact), e);
             return null;
         }
     }

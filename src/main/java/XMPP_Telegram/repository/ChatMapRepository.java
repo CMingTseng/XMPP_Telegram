@@ -13,7 +13,7 @@ public interface ChatMapRepository {
 
     ChatMap sendToTelegram(XMPPAccount xmppAccount, String contact);
 
-    ChatMap getByUserAndAccountAndContact(TelegramUser user, XMPPAccount account, String contact);
+    ChatMap getByUserAndAccountAndContact(XMPPAccount account, String contact);
 
     void create (ChatMap chatMap);
 

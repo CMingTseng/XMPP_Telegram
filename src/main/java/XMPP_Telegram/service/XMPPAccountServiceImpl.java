@@ -13,8 +13,12 @@ import java.util.List;
 @Service
 public class XMPPAccountServiceImpl implements XMPPAccountService {
 
+    private final XMPPAccountRepository repository;
+
     @Autowired
-    private XMPPAccountRepository repository;
+    public XMPPAccountServiceImpl(XMPPAccountRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public List<XMPPConnection> getAllConnections() {
@@ -44,20 +48,13 @@ public class XMPPAccountServiceImpl implements XMPPAccountService {
     }
 
     @Override
-    public XMPPAccount create(TelegramUser user, String server, String login, String password, int port) {
+    public boolean create(TelegramUser user, String server, String login, String password, int port) {
         if (repository.get(server, login) == null) {
             XMPPAccount account = new XMPPAccount(server, login, password, port);
             account.setTelegramUser(user);
             repository.create(account);
-            return repository.get(server, login);
-        } else {
-            XMPPAccount account = repository.get(server, login);
-            if (account.getTelegramUser().getId() == user.getId()) {
-                account.setPassword(password);
-                account.setPort(port);
-                return repository.update(account);
-            } else return null;
-        }
+            return true;
+        } else return false;
     }
 
     @Override

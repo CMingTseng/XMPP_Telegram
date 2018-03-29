@@ -1,12 +1,10 @@
 package XMPP_Telegram.config;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @author UnAfraid
- */
+import javax.validation.constraints.NotBlank;
+
 @Configuration
 @ConfigurationProperties(prefix = "telegram")
 public class TelegramConfig {

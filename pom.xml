@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github</groupId>
-    <artifactId>XMPP_Telegram</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>xmpp_telegram</artifactId>
+    <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>XMPP_Telegram</name>
-    <description>Demo project for Spring Boot</description>
+    <name>xmpptelegram</name>
+    <description>telegram bot for transfer xmpp messages</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -93,7 +93,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
 
         <!--Logging with SLF4J & LogBack-->
         <dependency>

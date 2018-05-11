@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.objects.Update;
+import xmpptelegram.model.XMPPAccount;
+
+import java.util.List;
 
 @Service
 public class TelegramCommandService {
@@ -40,10 +43,12 @@ public class TelegramCommandService {
             }
             case "/addaccount": {
                 try {
-                    if (args.length == 4)
-                        return addAccount(update.getMessage().getFrom().getId(), args[1], args[2], args[3]);
+                    if (args.length == 3)
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
+                    else if (args.length == 4)
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3]);
                     else if (args.length == 5)
-                        return addAccount(update.getMessage().getFrom().getId(), args[1], args[2], args[3], Integer.parseInt(args[4]));
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3], Integer.parseInt(args[4]));
                     else return "Команда не распознана";
                 } catch (Exception e) {
                     LOGGER.warn(String.format("Аргументы команды /addaccount не распознаны! Команда: %s", update.getMessage().getText()), e);
@@ -70,6 +75,23 @@ public class TelegramCommandService {
             case "/deletegroup": {
                 return deleteGroup(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
+            case "/status": {
+                return status(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
+            }
+            case "/update": {
+                try {
+                    if (args.length == 3) {
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
+                    } else if (args.length == 4) {
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3]);
+                    } else if (args.length == 5) {
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3], Integer.parseInt(args[4]));
+                    } else return "Команда не распознана";
+                } catch (Exception e) {
+                    LOGGER.warn("Аргументы команды /update не распознаны!", e);
+                    return "Команда не распознана!";
+                }
+            }
             default:
                 return "Команда не распознана!";
         }
@@ -77,8 +99,17 @@ public class TelegramCommandService {
 
     private String help() {
         return "/start - регистрация нового пользователя\n" +
-                "/addAccount XMPP-server XMPP-login password - заведение нового XMPP-аккаунта\n" +
-                "/addGroup XMPP-account XMPP-contact - переадресация в группу сообщений данного XMPP-contact\n";
+                "/default - выбор чата по-умолчанию для всех сообщений\n" +
+                "/addAccount [XMPP-account] [password] - заведение нового XMPP-аккаунта\n" +
+                "/addAccount [XMPP-server] [XMPP-account] [password] - заведение нового XMPP-аккаунта\n" +
+                "/addAccount [XMPP-server] [XMPP-account] [password] [port] - заведение нового XMPP-аккаунта\n" +
+                "/update [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
+                "/update [XMPP-server] [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
+                "/update [XMPP-server] [XMPP-account] [password] [port] - обновление данных XMPP-аккаунта\n" +
+                "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только в групповых чатах)\n" +
+                "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только в групповых чатах)\n" +
+                "/deleteGroup - отключение переадресации в текущую группу\n" +
+                "/deleteMe - отключение от бота\n";
     }
 
     private String start(int id, String login) {
@@ -90,13 +121,21 @@ public class TelegramCommandService {
         } else return "Пользователь уже существует";
     }
 
-    private String addAccount(int userId, String server, String login, String password) {
-        return addAccount(userId, server, login, password, 5222);
+    private String addAccount(int userId, long chatId, String login, String password) throws Exception {
+        String server = login.split("@")[1];
+        login = login.split("@")[0];
+        return addAccount(userId, chatId, server, login, password, 5222);
     }
 
-    private String addAccount(int userId, String server, String login, String password, int port) {
+    private String addAccount(int userId, long chatId, String server, String login, String password) {
+        return addAccount(userId, chatId, server, login, password, 5222);
+    }
+
+    private String addAccount(int userId, long chatId, String server, String login, String password, int port) {
         if (telegramUserService.getById(userId) == null) {
             return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
+        } else if ((long) userId != chatId) {
+            return "Данную команду нельзя использовать в групповом чате";
         } else if (xmppAccountService.get(server, login) != null) {
             if (xmppAccountService.get(server, login).getTelegramUser().getId() == userId) {
                 return "Данный аккаунт уже Вами зарегистрирован";
@@ -112,7 +151,7 @@ public class TelegramCommandService {
     }
 
     private String addGroup(int userId, long chatId, String server, String login, String contact) {
-        if (userId == chatId) {
+        if ((long) userId == chatId) {
             return "Чат не является группой";
         } else if (telegramUserService.getById(userId) == null) {
             return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
@@ -136,7 +175,7 @@ public class TelegramCommandService {
     }
 
     private String deleteGroup(int userId, long chatId) {
-        if (userId == chatId) {
+        if ((long) userId == chatId) {
             return "Чат не является группой";
         } else if (telegramUserService.getById(userId) == null) {
             return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
@@ -157,9 +196,53 @@ public class TelegramCommandService {
         } else {
             TelegramUser user = telegramUserService.getById(userId);
             user.setDefaultChat(chatId);
-            if (telegramUserService.update(user)!=null) {
+            if (telegramUserService.update(user) != null) {
                 return "Чат по-умолчанию переопределен";
             } else return "Ошибка переопределения чата по-умолчанию!";
+        }
+    }
+
+    private String status(int userId, long chatId) {
+        if (telegramUserService.getById(userId) == null) {
+            return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
+        } else if ((long) userId != chatId) {
+            return "Данную команду нельзя использовать в групповом чате";
+        } else if (xmppAccountService.getAllByUser(telegramUserService.getById(userId)).size() == 0) {
+            return "Нет активных XMPP-аккаунтов";
+        } else {
+            List<XMPPAccount> accounts = xmppAccountService.getAllByUser(telegramUserService.getById(userId));
+            StringBuilder result = new StringBuilder();
+            for (XMPPAccount account : accounts) {
+                result.append(String.format("Аккаунт %s: %s\n", account.getLogin() + "@" + account.getServer(), xmppBot.checkStatus(account)));
+            }
+            return result.toString();
+        }
+    }
+
+    private String update(int userId, long chatId, String login, String password) throws Exception {
+        String server = login.split("@")[1];
+        login = login.split("@")[0];
+        return update(userId, chatId, server, login, password, 5222);
+    }
+
+    private String update(int userId, long chatId, String server, String login, String password) {
+        return update(userId, chatId, server, login, password, 5222);
+    }
+
+    private String update(int userId, long chatId, String server, String login, String password, int port) {
+        if (telegramUserService.getById(userId) == null) {
+            return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
+        } else if ((long) userId != chatId) {
+            return "Данную команду нельзя использовать в групповом чате";
+        } else if (xmppAccountService.get(server, login) == null) {
+            return "Данный XMPP-аккаунт не зарегистрирован";
+        } else {
+            XMPPAccount account = xmppAccountService.get(server, login);
+            account.setPassword(password);
+            account.setPort(port);
+            if (xmppAccountService.update(account) == null) {
+                return "Ошибка обновления аккаунта!";
+            } else return "Данные успешно обновлены";
         }
     }
 }

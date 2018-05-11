@@ -77,6 +77,18 @@ public class XMPPConnection implements Runnable {
     }
 
     /*
+     *Отправляет текущий статус учетной записи в Telegram
+     */
+    private void sendCheckStatus() {
+        String status;
+        if (isConnected())
+            status = "Подключен";
+        else
+            status = "Не в сети";
+        controller.receiveXMPPMessage(server, login, "status message", status);
+    }
+
+    /*
      *Создание подключения
      */
     private void createConnection() throws Exception {
@@ -84,6 +96,7 @@ public class XMPPConnection implements Runnable {
             configure();
             connect();
             login();
+            sendCheckStatus();
             map = new HashMap<String, Chat>();
             chatManager = ChatManager.getInstanceFor(connection);
             chatManager.addIncomingListener(listener = new IncomingChatMessageListener() {
@@ -107,6 +120,7 @@ public class XMPPConnection implements Runnable {
             chatManager.removeListener(listener);
         if (connection.isConnected())
             connection.disconnect();
+        sendCheckStatus();
         Thread.currentThread().interrupt();
     }
 

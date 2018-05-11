@@ -40,9 +40,8 @@ public class XMPPAccountService {
         return repository.delete(account) > 0;
     }
 
-    public XMPPAccount update(XMPPAccount account, String server, String login, String password, int port) {
-//        repository.update(account, server, login, password, port);
-        return repository.get(server, login);
+    public XMPPAccount update(XMPPAccount account) {
+            return repository.update(account);
     }
 
     public boolean create(TelegramUser user, String server, String login, String password, int port) {
@@ -52,6 +51,13 @@ public class XMPPAccountService {
             repository.create(account);
             return true;
         } else return false;
+    }
+
+    public List<XMPPAccount> getAllByUser(TelegramUser user) {
+        List <XMPPAccount> result = repository.getAllByUser(user.getId());
+        if (result == null)
+            result = new ArrayList<>();
+        return result;
     }
 
     public XMPPAccount getById(int id) {

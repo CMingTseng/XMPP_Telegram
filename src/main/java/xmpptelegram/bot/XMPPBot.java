@@ -91,4 +91,13 @@ public class XMPPBot {
             }
         }
     }
+
+    public String checkStatus(XMPPAccount account) {
+        for (XMPPConnection connection : connections) {
+            if (connection.equalsByXMPPAccount(account)) {
+                return connection.isConnected() ? "Подключен" : "Не в сети";
+            }
+        }
+        return "Нет аккаунта";
+    }
 }

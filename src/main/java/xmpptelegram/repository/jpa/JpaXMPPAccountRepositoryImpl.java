@@ -47,7 +47,12 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     @Override
     @Transactional
     public XMPPAccount update(XMPPAccount account) {
-        return entityManager.merge(account);
+        try {
+            return entityManager.merge(account);
+        }catch (Exception e) {
+            LOGGER.warn(String.format("Error updating XMPP-account! Server: %s, login: %s",account.getServer(),account.getLogin()), e.getMessage());
+            return null;
+        }
     }
 
     @Override
@@ -59,5 +64,17 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
     @Override
     public XMPPAccount getById(int id) {
         return entityManager.find(XMPPAccount.class, id);
+    }
+
+    @Override
+    public List<XMPPAccount> getAllByUser(int userId) {
+        try {
+            return entityManager.createNamedQuery(XMPPAccount.GET_ALL_BY_USER, XMPPAccount.class)
+                    .setParameter("telegramUserId", userId)
+                    .getResultList();
+        }catch (NoResultException e) {
+            LOGGER.warn(String.format("Users not found teelegram user id: %s",userId), e.getMessage());
+            return null;
+        }
     }
 }

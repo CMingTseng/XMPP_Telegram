@@ -46,7 +46,10 @@ public class MessageService {
         ChatMap map = chatMapService.sendToTelegram(account, contact);
         if (map == null) {
             map = new ChatMap(account.getTelegramUser().getDefaultChat(), account, contact);
-            text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
+            if (contact.equals("status message"))
+                text = String.format("Статус аккаунта %s: %s", account.getLogin() + "@" + account.getServer(), text);
+            else
+                text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
         }
         send(new TransferMessage(map, text, true));
     }

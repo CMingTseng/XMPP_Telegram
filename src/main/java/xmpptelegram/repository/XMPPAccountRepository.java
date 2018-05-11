@@ -16,4 +16,6 @@ public interface XMPPAccountRepository {
     void create (XMPPAccount account);
 
     XMPPAccount getById(int id);
+
+    List<XMPPAccount> getAllByUser(int userId);
 }

@@ -35,20 +35,19 @@ public class RESTController {
 
     @RequestMapping("/secured")
     public String secured(){
-        System.out.println("Inside secured()");
-        return "Hello user !!!";
+        return "HTTPS Enable";
     }
 
-    @RequestMapping("/stop")
-    public String stop(){
-        xmppBot.stop();
-        return "XMPP server stoped";
-    }
-    @RequestMapping("/start")
-    public String start(){
-        xmppBot.start();
-        return "XMPP server started";
-    }
+//    @RequestMapping("/stop")
+//    public String stop(){
+//        xmppBot.stop();
+//        return "XMPP server stoped";
+//    }
+//    @RequestMapping("/start")
+//    public String start(){
+//        xmppBot.start();
+//        return "XMPP server started";
+//    }
 
     @RequestMapping(value = "/${telegram.token}", method = RequestMethod.POST)
     @ResponseBody

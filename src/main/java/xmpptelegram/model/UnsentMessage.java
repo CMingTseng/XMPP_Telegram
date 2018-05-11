@@ -7,7 +7,12 @@ import java.util.Date;
 @SuppressWarnings("JpaQlInspection")
 @Entity
 @Table(name = "unsent_messages", uniqueConstraints = @UniqueConstraint(columnNames = "date", name = "messages_dtinput_index"))
+@NamedQueries({
+        @NamedQuery(name = UnsentMessage.GET_ALL, query = "SELECT m FROM UnsentMessage m ORDER BY m.id")
+})
 public class UnsentMessage {
+    public static final String GET_ALL = "getAll";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

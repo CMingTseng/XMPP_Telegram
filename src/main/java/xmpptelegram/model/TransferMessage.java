@@ -7,24 +7,12 @@ import java.util.Date;
 
 public class TransferMessage {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(name = "text")
-    @NotNull
     private String text;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "chatmap")
     private ChatMap chatMap;
 
-    @Column(name = "fromXMPP", nullable = false)
-    @NotNull
     private boolean fromXMPP;
 
-    @Column(name = "date")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     public TransferMessage() {
@@ -42,14 +30,6 @@ public class TransferMessage {
 
     public void setChatMap(ChatMap chatMap) {
         this.chatMap = chatMap;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getText() {
@@ -79,8 +59,7 @@ public class TransferMessage {
     @Override
     public String toString() {
         return "TransferMessage{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
+                "text='" + text + '\'' +
                 ", chatMap=" + chatMap +
                 ", fromXMPP=" + fromXMPP +
                 ", date=" + date +

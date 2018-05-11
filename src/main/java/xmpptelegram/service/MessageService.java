@@ -14,6 +14,8 @@ import xmpptelegram.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MessageService {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
@@ -37,10 +39,9 @@ public class MessageService {
         this.repository = repository;
     }
 
-//    public boolean create(TransferMessage message) {
-//        repository.create(message);
-//        return false;
-//    }
+    public List<UnsentMessage> getAll() {
+        return repository.getAll();
+    }
 
     public void messageFromXMPP(XMPPAccount account, String contact, String text) {
         ChatMap map = chatMapService.sendToTelegram(account, contact);
@@ -52,6 +53,19 @@ public class MessageService {
                 text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
         }
         send(new TransferMessage(map, text, true));
+    }
+
+    public synchronized void send(UnsentMessage unsentMessage) {
+        TransferMessage message = new TransferMessage();
+        message.setFromXMPP(unsentMessage.isFromXMPP());
+        message.setText(unsentMessage.getText());
+        message.setDate(unsentMessage.getDate());
+        ChatMap map = chatMapService.getByAccountAndContact(unsentMessage.getXmppAccount(), unsentMessage.getXmppContact());
+        if (map != null) {
+            message.setChatMap(map);
+            repository.delete(unsentMessage);
+            send(message);
+        }
     }
 
     private void send(TransferMessage transferMessage) {

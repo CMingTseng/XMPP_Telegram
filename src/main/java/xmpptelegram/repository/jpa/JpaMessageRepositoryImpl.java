@@ -8,7 +8,9 @@ import xmpptelegram.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
@@ -46,5 +48,15 @@ public class JpaMessageRepositoryImpl implements MessageRepository {
     @Override
     public UnsentMessage get(int id) {
         return entityManager.find(UnsentMessage.class, id);
+    }
+
+    @Override
+    public List<UnsentMessage> getAll() {
+        try {
+            return entityManager.createNamedQuery(UnsentMessage.GET_ALL, UnsentMessage.class)
+                    .getResultList();
+        }catch (NoResultException e) {
+            return null;
+        }
     }
 }

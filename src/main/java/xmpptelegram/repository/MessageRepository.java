@@ -16,4 +16,6 @@ public interface MessageRepository {
 
     UnsentMessage get(int id);
 
+    List<UnsentMessage> getAll();
+
 }

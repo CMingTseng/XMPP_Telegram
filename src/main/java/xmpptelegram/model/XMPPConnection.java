@@ -103,7 +103,6 @@ public class XMPPConnection implements Runnable {
                 @Override
                 public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
-//                        try {
                         map.put(message.getFrom().asEntityBareJidIfPossible().toString(), chat);
                         controller.receiveXMPPMessage(server, login, message.getFrom().asEntityBareJidIfPossible().toString(), message.getBody());
                     }
@@ -162,6 +161,14 @@ public class XMPPConnection implements Runnable {
 
     public void setController(XMPPBot controller) {
         this.controller = controller;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public String getLogin() {
+        return login;
     }
 
     private class SSLSetting {

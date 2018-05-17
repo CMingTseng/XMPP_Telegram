@@ -31,17 +31,21 @@ public class TelegramCommandService {
         String[] args = update.getMessage().getText().split(" ");
         switch (command) {
             case "/help": {
+                LOGGER.info("Command /help invoked");
                 return help();
             }
             case "/start": {
+                LOGGER.info("Command /start invoked");
                 if ((long) update.getMessage().getFrom().getId() == update.getMessage().getChatId()) {
                     return start(update.getMessage().getFrom().getId(), update.getMessage().getFrom().getUserName());
                 } else return "Команда не распознана";
             }
             case "/default": {
+                LOGGER.info("Command /default invoked");
                 return defaultChat(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/addaccount": {
+                LOGGER.info("Command /addaccount invoked");
                 try {
                     if (args.length == 3)
                         return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
@@ -56,6 +60,7 @@ public class TelegramCommandService {
                 }
             }
             case "/addgroup": {
+                LOGGER.info("Command /addgroup invoked");
                 try {
                     if (args.length == 3) {
                         String server = args[1].split("@")[1];
@@ -68,17 +73,21 @@ public class TelegramCommandService {
                 }
             }
             case "/deleteme": {
+                LOGGER.info("Command /deleteme invoked");
                 if ((long) update.getMessage().getFrom().getId() == update.getMessage().getChatId()) {
                     return deleteTelegramAccount(update.getMessage().getFrom().getId());
                 } else return "Команда не распознана!";
             }
             case "/deletegroup": {
+                LOGGER.info("Command /deletegroup invoked");
                 return deleteGroup(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/status": {
+                LOGGER.info("Command /status invoked");
                 return status(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/update": {
+                LOGGER.info("Command /update invoked");
                 try {
                     if (args.length == 3) {
                         return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
@@ -92,6 +101,10 @@ public class TelegramCommandService {
                     return "Команда не распознана!";
                 }
             }
+            case "/reconnect": {
+                LOGGER.info("Command /reconnect invoked");
+                return reconnect(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
+            }
             default:
                 return "Команда не распознана!";
         }
@@ -99,6 +112,8 @@ public class TelegramCommandService {
 
     private String help() {
         return "/start - регистрация нового пользователя\n" +
+                "/status - статус подключения XMPP-аккаунтов\n" +
+                "/reconnect - переподключить XMPP-аккаунты\n" +
                 "/default - выбор чата по-умолчанию для всех сообщений\n" +
                 "/addAccount [XMPP-account] [password] - заведение нового XMPP-аккаунта\n" +
                 "/addAccount [XMPP-server] [XMPP-account] [password] - заведение нового XMPP-аккаунта\n" +
@@ -106,7 +121,6 @@ public class TelegramCommandService {
                 "/update [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
                 "/update [XMPP-server] [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
                 "/update [XMPP-server] [XMPP-account] [password] [port] - обновление данных XMPP-аккаунта\n" +
-                "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только в групповых чатах)\n" +
                 "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только в групповых чатах)\n" +
                 "/deleteGroup - отключение переадресации в текущую группу\n" +
                 "/deleteMe - отключение от бота\n";
@@ -243,6 +257,31 @@ public class TelegramCommandService {
             if (xmppAccountService.update(account) == null) {
                 return "Ошибка обновления аккаунта!";
             } else return "Данные успешно обновлены";
+        }
+    }
+
+    private String reconnect(int userId, long chatId) {
+        if (telegramUserService.getById(userId) == null) {
+            return "Telegram-аккаунт не зарегистрирован! Выполните команду /start";
+        } else if ((long) userId != chatId) {
+            return "Данную команду нельзя использовать в групповом чате";
+        } else {
+            List<XMPPAccount> accounts = xmppAccountService.getAllByUser(telegramUserService.getById(userId));
+            if (accounts == null) {
+                return "Нет доступных XMPP-аккаунтов";
+            }else {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (XMPPAccount account : accounts) {
+                            xmppBot.disconnectAccount(account);
+                            xmppBot.connectAccount(account);
+                        }
+                    }
+                }).start();
+                return "Команда выполнена успешно";
+            }
+
         }
     }
 }

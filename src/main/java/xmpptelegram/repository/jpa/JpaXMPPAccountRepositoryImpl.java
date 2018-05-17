@@ -73,7 +73,7 @@ public class JpaXMPPAccountRepositoryImpl implements XMPPAccountRepository {
                     .setParameter("telegramUserId", userId)
                     .getResultList();
         }catch (NoResultException e) {
-            LOGGER.warn(String.format("Users not found teelegram user id: %s",userId), e.getMessage());
+            LOGGER.warn(String.format("Users not found telegram user id: %s",userId), e.getMessage());
             return null;
         }
     }

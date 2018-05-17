@@ -18,7 +18,7 @@ import java.util.List;
 public class XMPPBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(XMPPBot.class);
 
-    private List<XMPPConnection> connections;
+    private volatile List<XMPPConnection> connections;
 
     private XMPPAccountService accountService;
 
@@ -40,14 +40,18 @@ public class XMPPBot {
                     new Thread(connection).start();
             }
         }
+        new StatusChecker(this).start();
+
     }
 
     public void stop() {
-        if (connections != null) {
-            for (XMPPConnection connection : connections) {
-                connection.close();
+        synchronized (connections) {
+            if (connections != null) {
+                for (XMPPConnection connection : connections) {
+                    connection.close();
+                }
+                connections = null;
             }
-            connections = null;
         }
     }
 
@@ -64,7 +68,7 @@ public class XMPPBot {
     public void connectAccount(XMPPAccount account) {
         XMPPConnection connection = new XMPPConnection(account);
         connection.setController(this);
-        if (connections==null) connections = new ArrayList<>();
+        if (connections == null) connections = new ArrayList<>();
         for (XMPPConnection temp : connections) {
             if (temp.equalsByXMPPAccount(account)) {
                 temp.close();
@@ -99,5 +103,38 @@ public class XMPPBot {
             }
         }
         return "Нет аккаунта";
+    }
+
+    private class StatusChecker extends Thread {
+
+        private XMPPBot controller;
+
+        StatusChecker(XMPPBot controller) {
+            this.setDaemon(true);
+            this.controller = controller;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(300000);
+                    synchronized (connections) {
+                        for (int i = 0; i < connections.size(); i++) {
+                            if (!connections.get(i).isConnected()) {
+                                XMPPConnection connection = new XMPPConnection(accountService.get(connections.get(i).getServer(), connections.get(i).getLogin()));
+                                connections.get(i).close();
+                                connections.add(i, connection);
+                                connection.setController(controller);
+                                if (!connection.isConnected())
+                                    new Thread(connection).start();
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    LOGGER.error("Error status checker\n" + e.getMessage());
+                }
+            }
+        }
     }
 }

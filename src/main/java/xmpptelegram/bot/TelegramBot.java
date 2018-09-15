@@ -1,5 +1,6 @@
 package xmpptelegram.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,8 +15,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -39,13 +38,13 @@ import java.nio.file.Files;
 
 
 @Component
+@Slf4j
 public class TelegramBot extends DefaultAbsSender implements WebhookBot {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TelegramBot.class);
 
     private final DefaultBotOptions botOptions;
 
     @Autowired
-    ResourceLoader loader;
+    private ResourceLoader loader;
 
     @Autowired
     private TelegramConfig config;
@@ -62,33 +61,33 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
         this.botOptions = options;
     }
 
-    @PostConstruct
     public void init() {
         try {
             ApiContextInitializer.init();
             setWebhook(config.getPath() + config.getToken(), getCert());
         } catch (TelegramApiRequestException e) {
-            LOGGER.error("Error executing setWebHook method", e);
+            log.error("Error executing setWebHook method", e);
         }
     }
 
     @Override
     public BotApiMethod onWebhookUpdateReceived(Update update) {
         if (update != null) {
-            LOGGER.debug(String.format("New telegram message: %s", update.toString()));
+            log.debug(String.format("New telegram message: %s", update.toString()));
             try {
                 if (update.hasChosenInlineQuery() || update.hasInlineQuery() || update.hasCallbackQuery() || update.hasEditedMessage()) {
                     // Wrong message type
-                    LOGGER.warn("MessageType doesn't support. Message: %s", update.toString());
+                    log.warn("MessageType doesn't support. Message: %s", update.toString());
                 } else if (update.hasMessage()) {
-                    LOGGER.info("Message to bot: " + update.toString());
-                    messageService.messageFromTelegram(update);
+                    log.debug("Message to bot: " + update.toString());
+                    messageService.send(update);
                     // Handle message
                 } else {
-                    LOGGER.warn("Update doesn't contains neither ChosenInlineQuery/InlineQuery/CallbackQuery/EditedMessage/Message Update: {}", update.toString());
+                    log.warn("Update doesn't contains neither ChosenInlineQuery/InlineQuery/CallbackQuery/EditedMessage/Message Update: {}",
+                            update.toString());
                 }
             } catch (Exception e) {
-                LOGGER.error(String.format("Failed to handle incoming update. Update: %s",update.toString()), e);
+                log.error(String.format("Failed to handle incoming update. Update: %s", update.toString()), e);
             }
         }
         return null;
@@ -96,6 +95,52 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
 
     @Override
     public void setWebhook(String url, String publicCertificatePath) throws TelegramApiRequestException {
+//        log.debug("Try to setWebHook with URL " + url);
+//        try (CloseableHttpClient httpclient = HttpClientBuilder.create().setSSLHostnameVerifier(new NoopHostnameVerifier()).build()) {
+//            String requestUrl = getBaseUrl() + SetWebhook.PATH;
+//            HttpPost httppost = new HttpPost(requestUrl);
+//            httppost.setConfig(botOptions.getRequestConfig());
+//            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+//            builder.addTextBody(SetWebhook.URL_FIELD, url);
+//            if (botOptions.getMaxWebhookConnections() != null) {
+//                builder.addTextBody(SetWebhook.MAXCONNECTIONS_FIELD, botOptions.getMaxWebhookConnections().toString());
+//            }
+//            if (botOptions.getAllowedUpdates() != null) {
+//                builder.addTextBody(SetWebhook.ALLOWEDUPDATES_FIELD, new JSONArray(botOptions.getMaxWebhookConnections()).toString());
+//            }
+//            if (publicCertificatePath != null) {
+//                File certificate = Files.createTempFile("temp_", ".pem").toFile();
+//                certificate.deleteOnExit();
+//                try (InputStream in = loader.getResource(publicCertificatePath).getInputStream();
+//                     OutputStream out = new FileOutputStream(certificate)) {
+//                    IOUtils.copy(in, out);
+//                    if (certificate.exists()) {
+//                        log.info("Upload webHook certificate");
+//                        builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
+//                        builder.addTextBody("has_custom_certificate", "true");
+//                    }
+//                }
+//            }
+//            HttpEntity multipart = builder.build();
+//            log.debug("setWebHook HTTP body\n" + multipart.toString());
+//            httppost.setEntity(multipart);
+//            try (CloseableHttpResponse response = httpclient.execute(httppost)) {
+//                HttpEntity ht = response.getEntity();
+//                BufferedHttpEntity buf = new BufferedHttpEntity(ht);
+//                String responseContent = EntityUtils.toString(buf, StandardCharsets.UTF_8);
+//                JSONObject jsonObject = new JSONObject(responseContent);
+//                if (!jsonObject.getBoolean(ApiConstants.RESPONSE_FIELD_OK)) {
+//                    throw new TelegramApiRequestException("Error setting webhook", jsonObject);
+//                } else {
+//                    log.info("WebHook has set success");
+//                }
+//            }
+//        } catch (JSONException e) {
+//            throw new TelegramApiRequestException("Error deserializing setWebhook method response", e);
+//        } catch (IOException e) {
+//            throw new TelegramApiRequestException("Error executing setWebook method", e);
+//        }
+
         try (CloseableHttpClient httpclient = HttpClientBuilder.create().setSSLHostnameVerifier(new NoopHostnameVerifier()).build()) {
             String requestUrl = getBaseUrl() + SetWebhook.PATH;
 
@@ -110,16 +155,9 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
                 builder.addTextBody(SetWebhook.ALLOWEDUPDATES_FIELD, new JSONArray(botOptions.getMaxWebhookConnections()).toString());
             }
             if (publicCertificatePath != null) {
-                File certificate = Files.createTempFile("temp_", ".pem").toFile();
-                certificate.deleteOnExit();
-                try (InputStream in = loader.getResource(publicCertificatePath).getInputStream();
-                     OutputStream out = new FileOutputStream(certificate)) {
-                    IOUtils.copy(in, out);
-                    if (certificate.exists()) {
-                        LOGGER.info("Upload webhook certificate");
-                        builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
-                        builder.addTextBody("has_custom_certificate", "true");
-                    }
+                File certificate = new File(publicCertificatePath);
+                if (certificate.exists()) {
+                    builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
                 }
             }
             HttpEntity multipart = builder.build();
@@ -138,6 +176,7 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
         } catch (IOException e) {
             throw new TelegramApiRequestException("Error executing setWebook method", e);
         }
+
 
     }
 

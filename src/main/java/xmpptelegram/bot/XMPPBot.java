@@ -1,140 +1,108 @@
 package xmpptelegram.bot;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.InitBinder;
 import xmpptelegram.model.TransferMessage;
 import xmpptelegram.model.XMPPAccount;
 import xmpptelegram.model.XMPPConnection;
 import xmpptelegram.service.MessageService;
 import xmpptelegram.service.XMPPAccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-@Controller
+@Slf4j
+@NoArgsConstructor
+@Component
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class XMPPBot {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XMPPBot.class);
 
-    private volatile List<XMPPConnection> connections;
+    private final ConcurrentMap<XMPPAccount, XMPPConnection> connections = new ConcurrentHashMap<>();
 
+    public static ExecutorService threadPool = Executors.newFixedThreadPool(10);
+
+    @Autowired
     private XMPPAccountService accountService;
 
+    @Getter
     @Autowired
     private MessageService messageService;
 
-    @Autowired
-    public XMPPBot(XMPPAccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    @PostConstruct
     public void start() {
-        if (connections == null) {
-            connections = accountService.getAllConnections();
-            for (XMPPConnection connection : connections) {
-                connection.setController(this);
-                if (!connection.isConnected())
-                    new Thread(connection).start();
-            }
+        log.debug("XMPPBot is starting");
+        if (connections.size() > 0) {
+            stop();
         }
-        new StatusChecker(this).start();
-
+        List<XMPPAccount> accounts = accountService.getAll();
+        for (XMPPAccount account : accounts) {
+            connections.put(account, new XMPPConnection(account, this).createConnection());
+        }
+        log.info("XMPPBot started");
     }
 
     public void stop() {
-        synchronized (connections) {
-            if (connections != null) {
-                for (XMPPConnection connection : connections) {
-                    connection.close();
-                }
-                connections = null;
-            }
-        }
+        connections.forEach((XMPPAccount k, XMPPConnection v) -> connections.remove(k).closeConnection());
     }
 
+
     public void disconnectAccount(XMPPAccount account) {
-        for (XMPPConnection connection : connections) {
-            if (connection.equalsByXMPPAccount(account)) {
-                connection.close();
-                connections.remove(connection);
-                return;
-            }
-        }
+        connections.remove(account).closeConnection();
     }
 
     public void connectAccount(XMPPAccount account) {
-        XMPPConnection connection = new XMPPConnection(account);
-        connection.setController(this);
-        if (connections == null) connections = new ArrayList<>();
-        for (XMPPConnection temp : connections) {
-            if (temp.equalsByXMPPAccount(account)) {
-                temp.close();
-                connections.remove(temp);
-                break;
-            }
-        }
-        connections.add(connection);
-        new Thread(connection).start();
+        connections.put(account, new XMPPConnection(account, this).createConnection());
     }
+//
+//    //Сообщения из XMPP в Telegram
+//    public void receiveXMPPMessage(String server, String login, String contact, String text) {
+//
+//        XMPPAccount account = accountService.get(server, login);
+//        messageService.messageFromXMPP(account, contact, text);
+//
+//    }
 
-    public void receiveXMPPMessage(String server, String login, String contact, String text) {
-        synchronized (this) {
-            XMPPAccount account = accountService.get(server, login);
-            messageService.messageFromXMPP(account, contact, text);
-        }
-    }
-
-    public void sendXMPPMessage(TransferMessage transferMessage) {
-        for (XMPPConnection connection : connections) {
-            if (connection.equalsByXMPPAccount(transferMessage.getChatMap().getXmppAccount())) {
-                connection.sendMessage(transferMessage);
-                break;
-            }
+    //Сообщения из Telegram в XMPP
+    public boolean sendXMPPMessage(TransferMessage transferMessage) {
+        try {
+            return connections.get(transferMessage.getChatMap().getXmppAccount()).sendMessage(transferMessage);
+        } catch (NullPointerException e) {
+            log.error(String.format("Can't send message to that XMPPAccount! XMPPAccount doesn't have connection! XMPPAccount: %s",
+                    transferMessage.getChatMap().getXmppAccount().toString()));
+            return false;
         }
     }
 
     public String checkStatus(XMPPAccount account) {
-        for (XMPPConnection connection : connections) {
-            if (connection.equalsByXMPPAccount(account)) {
-                return connection.isConnected() ? "Подключен" : "Не в сети";
-            }
+        try {
+            return connections.get(account).getStatus();
+        } catch (NullPointerException e) {
+            return "Нет аккаунта";
         }
-        return "Нет аккаунта";
     }
 
-    private class StatusChecker extends Thread {
+    public void checkStatus(String server, String login) {
+        checkStatus(accountService.get(server, login));
+    }
 
-        private XMPPBot controller;
-
-        StatusChecker(XMPPBot controller) {
-            this.setDaemon(true);
-            this.controller = controller;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(300000);
-                    synchronized (connections) {
-                        for (int i = 0; i < connections.size(); i++) {
-                            if (!connections.get(i).isConnected()) {
-                                XMPPConnection connection = new XMPPConnection(accountService.get(connections.get(i).getServer(), connections.get(i).getLogin()));
-                                connections.get(i).close();
-                                connections.add(i, connection);
-                                connection.setController(controller);
-                                if (!connection.isConnected())
-                                    new Thread(connection).start();
-                            }
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    LOGGER.error("Error status checker\n" + e.getMessage());
-                }
+    @Scheduled(fixedDelay = 120_000L, initialDelay = 180_000L)
+    private void checkAllConnections() {
+        connections.forEach((XMPPAccount k, XMPPConnection v) -> {
+            if (!v.isConnected()) {
+                v.createConnection();
             }
-        }
+        });
     }
 }

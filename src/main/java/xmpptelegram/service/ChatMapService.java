@@ -1,25 +1,20 @@
 package xmpptelegram.service;
 
-import org.slf4j.LoggerFactory;
-import xmpptelegram.model.ChatMap;
-import xmpptelegram.model.TelegramUser;
-import xmpptelegram.model.XMPPAccount;
-import xmpptelegram.repository.ChatMapRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xmpptelegram.model.ChatMap;
+import xmpptelegram.model.XMPPAccount;
+import xmpptelegram.repository.jpa.ChatMapRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class ChatMapService {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChatMapService.class);
-
-    private final ChatMapRepository repository;
 
     @Autowired
-    public ChatMapService(ChatMapRepository repository) {
-        this.repository = repository;
-    }
+    private ChatMapRepository repository;
 
     public List<ChatMap> getAll() {
         return repository.getAll();
@@ -49,28 +44,28 @@ public class ChatMapService {
         return repository.getByChatId(chatId);
     }
 
-    public boolean delete (long chatId) {
+    public boolean delete(long chatId) {
         ChatMap chatMap = repository.getByChatId(chatId);
-        if (chatMap==null) {
+        if (chatMap == null) {
             return false;
-        }else {
+        } else {
             try {
                 repository.delete(chatMap);
                 return true;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 return false;
             }
         }
     }
 
-    public boolean delete (ChatMap chatMap) {
+    public boolean delete(ChatMap chatMap) {
         if (chatMap == null)
             return false;
         else {
             try {
                 repository.delete(chatMap);
                 return true;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 return false;
             }
         }

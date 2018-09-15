@@ -1,10 +1,12 @@
 package xmpptelegram.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.NotBlank;
 
+@Data
 @Configuration
 @ConfigurationProperties(prefix = "telegram")
 public class TelegramConfig {
@@ -18,38 +20,6 @@ public class TelegramConfig {
     private String path;
 
     private String cert;
-
-    public String getToken() {
-        return token;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getCert() {
-        return cert;
-    }
-
-    public void setCert(String cert) {
-        this.cert = cert;
-    }
 
     @Override
     public String toString() {

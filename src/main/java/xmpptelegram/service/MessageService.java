@@ -1,29 +1,38 @@
 package xmpptelegram.service;
 
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.updateshandlers.SentCallback;
 import xmpptelegram.bot.TelegramBot;
 import xmpptelegram.bot.XMPPBot;
 import xmpptelegram.model.ChatMap;
 import xmpptelegram.model.TransferMessage;
 import xmpptelegram.model.UnsentMessage;
 import xmpptelegram.model.XMPPAccount;
-import xmpptelegram.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import xmpptelegram.repository.jpa.MessageRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class MessageService {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
 
-    private final MessageRepository repository;
+    @Autowired
+    private MessageRepository repository;
 
     @Autowired
     private ChatMapService chatMapService;
+
+    @Autowired
+    private XMPPAccountService xmppAccountService;
 
     @Autowired
     private TelegramBot telegramBot;
@@ -34,82 +43,117 @@ public class MessageService {
     @Autowired
     private TelegramCommandService telegramCommandService;
 
-    @Autowired
-    public MessageService(MessageRepository repository) {
-        this.repository = repository;
+    @Scheduled(fixedDelay = 60000L, initialDelay = 10000L)
+    private void checkUnsentMessages() {
+        log.debug("checkUnsentMessages");
+        List<UnsentMessage> list = getAll();
+        log.debug(String.valueOf(list.size()));
+        for (UnsentMessage message : list) {
+            ChatMap map = chatMapService.getByAccountAndContact(message.getXmppAccount(), message.getXmppContact());
+            if (map != null) {
+                TransferMessage transferMessage = new TransferMessage();
+                transferMessage.setFromXMPP(message.isFromXMPP());
+                transferMessage.setText(message.getText());
+                transferMessage.setDate(message.getDate());
+                transferMessage.setChatMap(map);
+                repository.delete(message);
+                send(transferMessage, false);
+            } else if (message.isFromXMPP()) {
+                repository.delete(message);
+                send(message.getXmppAccount().getServer(), message.getXmppAccount().getLogin(), message.getXmppContact(),
+                        message.getText());
+            }
+        }
     }
 
     public List<UnsentMessage> getAll() {
         return repository.getAll();
     }
 
-    public void messageFromXMPP(XMPPAccount account, String contact, String text) {
-        ChatMap map = chatMapService.sendToTelegram(account, contact);
-        if (map == null) {
-            map = new ChatMap(account.getTelegramUser().getDefaultChat(), account, contact);
-            if (contact.equals("status message"))
-                text = String.format("Статус аккаунта %s: %s", account.getLogin() + "@" + account.getServer(), text);
-            else
-                text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(), contact, text);
+    public void send(TransferMessage transferMessage, boolean notification) {
+        if (notification) {
+            transferMessage.setFromXMPP(!transferMessage.isFromXMPP());
         }
-        send(new TransferMessage(map, text, true));
-    }
-
-    public synchronized void send(UnsentMessage unsentMessage) {
-        TransferMessage message = new TransferMessage();
-        message.setFromXMPP(unsentMessage.isFromXMPP());
-        message.setText(unsentMessage.getText());
-        message.setDate(unsentMessage.getDate());
-        ChatMap map = chatMapService.getByAccountAndContact(unsentMessage.getXmppAccount(), unsentMessage.getXmppContact());
-        if (map != null) {
-            message.setChatMap(map);
-            repository.delete(unsentMessage);
-            send(message);
-        }
-    }
-
-    private void send(TransferMessage transferMessage) {
         if (transferMessage.isFromXMPP()) {
             SendMessage message = new SendMessage();
             message.setChatId(transferMessage.getChatMap().getChatId());
             message.setText(transferMessage.getText());
             try {
-                telegramBot.execute(message);
+                telegramBot.executeAsync(message, new SentCallback<Message>() {
+                    @Override
+                    public void onResult(BotApiMethod<Message> method, Message response) {
+
+                    }
+
+                    @Override
+                    public void onError(BotApiMethod<Message> method, TelegramApiRequestException apiException) {
+                        log.error(String.format("Error sending message to Telegram! Message: %s", transferMessage.toString()),
+                                apiException);
+                        repository.create(new UnsentMessage(transferMessage));
+                    }
+
+                    @Override
+                    public void onException(BotApiMethod<Message> method, Exception exception) {
+                        log.error(String.format("TelegramAPI exception! Message: %s", transferMessage.toString()), exception);
+                        repository.create(new UnsentMessage(transferMessage));
+                    }
+                });
             } catch (TelegramApiException e) {
-                LOGGER.error(String.format("Error sending message to Telegram! Message: %s", transferMessage.toString()), e);
+                log.error("TelegramAPI error! Messages can't be sent!", e);
                 repository.create(new UnsentMessage(transferMessage));
             }
         } else {
-            try {
-                xmppBot.sendXMPPMessage(transferMessage);
-            } catch (Exception e) {
-                LOGGER.error(String.format("Error sending message to XMPP! Message: %s", transferMessage.toString()), e);
-                repository.create(new UnsentMessage(transferMessage));
-            }
+            XMPPBot.threadPool.execute(() -> {
+                if (!xmppBot.sendXMPPMessage(transferMessage)) {
+                    transferMessage.setText("Сообщение не доставлено получателю! Вероятно не удалось подключиться к XMPP-серверу! " +
+                            "Проверьте статус подключения и попробуйте еще раз!");
+                    send(transferMessage, true);
+                }
+            });
         }
+
     }
 
-    private void sendNotification(String text, long chatId) {
-        SendMessage message = new SendMessage();
-        message.setText(text);
-        message.setChatId(chatId);
-        try {
-            telegramBot.execute(message);
-        } catch (TelegramApiException e) {
-            LOGGER.error(String.format("Error sending notification to Telegram! Message: %s, ChatId: %d", text, chatId), e);
-        }
-    }
-
-    public void messageFromTelegram(Update update) {
-        ChatMap map = chatMapService.getByChatId(update.getMessage().getChatId());
+    public void send(Update update) {
+        TransferMessage message = new TransferMessage();
+        message.setChatMap(chatMapService.getByChatId(update.getMessage().getChatId()));
+        message.setFromXMPP(false);
         if (update.getMessage().getText().matches("^[/].+")) {
-            sendNotification(telegramCommandService.useCommand(update), update.getMessage().getChatId());
+            message.setText(telegramCommandService.useCommand(update));
+            send(message, true);
         } else {
-            if (update.getMessage().getChatId().equals((long) update.getMessage().getFrom().getId()) || map == null) {
-                LOGGER.warn("Incorrect chat. ", update.toString());
+            if (update.getMessage().getChatId().equals((long) update.getMessage().getFrom().getId()) || message.getChatMap() == null) {
+                message.setText("Неверный чат! Сообщение не будет доставлено - нет получателя!");
+                send(message, true);
+                log.warn("Incorrect chat. ", update.toString());
                 return;
             }
-            send(new TransferMessage(map, update.getMessage().getText(), false));
+            message.setText(update.getMessage().getText());
+            send(message, false);
         }
+    }
+
+    public void send(String server, String login, String contact, String text) {
+        XMPPAccount account = xmppAccountService.get(server, login);
+        if (account == null) {
+            log.error(String.format("Can't find account info! Message from XMPP didn't send! Server: %s, login: %s", server, login));
+            return;
+        }
+        ChatMap map = chatMapService.getByAccountAndContact(account, contact);
+        TransferMessage message = new TransferMessage();
+        message.setFromXMPP(true);
+        if (map == null) {
+            map = new ChatMap();
+            map.setXmppAccount(account);
+            map.setXmppContact(contact);
+            map.setChatId(account.getTelegramUser().getDefaultChat());
+            if (contact != null) { //null - когда отправляем просто сообщение о подключении\отключении
+                text = String.format("Сообщение для аккаунта: %s от контакта: %s \n%s", account.getLogin() + "@" + account.getServer(),
+                        contact, text);
+            }
+        }
+        message.setChatMap(map);
+        message.setText(text);
+        send(message, false);
     }
 }

@@ -1,20 +1,18 @@
 package xmpptelegram.controller;
 
-import org.slf4j.LoggerFactory;
-import xmpptelegram.bot.TelegramBot;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.objects.Update;
+import xmpptelegram.bot.TelegramBot;
 import xmpptelegram.bot.XMPPBot;
-import xmpptelegram.model.ChatMap;
-import xmpptelegram.model.TransferMessage;
-import xmpptelegram.repository.MessageRepository;
+import xmpptelegram.repository.jpa.MessageRepository;
 import xmpptelegram.service.ChatMapService;
 
+@Slf4j
 @RestController
 public class RESTController {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(RESTController.class);
 
     @Autowired
     private TelegramBot telegramBot;
@@ -34,7 +32,7 @@ public class RESTController {
     }
 
     @RequestMapping("/secured")
-    public String secured(){
+    public String secured() {
         return "HTTPS Enable";
     }
 

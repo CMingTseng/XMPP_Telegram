@@ -1,36 +1,36 @@
 package xmpptelegram.service;
 
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import xmpptelegram.model.TelegramUser;
 import xmpptelegram.model.XMPPAccount;
 import xmpptelegram.model.XMPPConnection;
-import xmpptelegram.repository.XMPPAccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import xmpptelegram.repository.jpa.XMPPAccountRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class XMPPAccountService {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(XMPPAccountService.class);
-
-    private final XMPPAccountRepository repository;
 
     @Autowired
-    public XMPPAccountService(XMPPAccountRepository repository) {
-        this.repository = repository;
+    private XMPPAccountRepository repository;
+
+    public List<XMPPAccount> getAll() {
+        return repository.getAll();
     }
 
-    public List<XMPPConnection> getAllConnections() {
-        List<XMPPAccount> list = repository.getAll();
-        List<XMPPConnection> result = new ArrayList<>();
-        for (XMPPAccount account : list) {
-            if (account.isActive())
-                result.add(new XMPPConnection(account));
-        }
-        return result;
-    }
+//    public List<XMPPConnection> getAllConnections() {
+//        List<XMPPAccount> list = repository.getAll();
+//        List<XMPPConnection> result = new ArrayList<>();
+//        for (XMPPAccount account : list) {
+//            if (account.isActive())
+//                result.add(new XMPPConnection(account));
+//        }
+//        return result;
+//    }
 
     public XMPPAccount get(String server, String login) {
         return repository.get(server, login);
@@ -41,7 +41,7 @@ public class XMPPAccountService {
     }
 
     public XMPPAccount update(XMPPAccount account) {
-            return repository.update(account);
+        return repository.update(account);
     }
 
     public boolean create(TelegramUser user, String server, String login, String password, int port) {
@@ -54,7 +54,7 @@ public class XMPPAccountService {
     }
 
     public List<XMPPAccount> getAllByUser(TelegramUser user) {
-        List <XMPPAccount> result = repository.getAllByUser(user.getId());
+        List<XMPPAccount> result = repository.getAllByUser(user.getId());
         if (result == null)
             result = new ArrayList<>();
         return result;

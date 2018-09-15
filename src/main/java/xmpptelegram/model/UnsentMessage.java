@@ -1,17 +1,24 @@
 package xmpptelegram.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @SuppressWarnings("JpaQlInspection")
 @Entity
+@Data
+@NoArgsConstructor
 @Table(name = "unsent_messages", uniqueConstraints = @UniqueConstraint(columnNames = "date", name = "messages_dtinput_index"))
 @NamedQueries({
-        @NamedQuery(name = UnsentMessage.GET_ALL, query = "SELECT m FROM UnsentMessage m ORDER BY m.id")
+        @NamedQuery(name = UnsentMessage.GET_ALL, query = "SELECT m FROM UnsentMessage m ORDER BY m.id"),
+        @NamedQuery(name = UnsentMessage.REMOVE, query = "DELETE FROM UnsentMessage m WHERE m.id=:id")
 })
 public class UnsentMessage {
     public static final String GET_ALL = "getAll";
+    public static final String REMOVE = "remove";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,25 +51,5 @@ public class UnsentMessage {
         fromXMPP = transferMessage.isFromXMPP();
         xmppContact = transferMessage.getChatMap().getXmppContact();
         date = new Date();
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public XMPPAccount getXmppAccount() {
-        return xmppAccount;
-    }
-
-    public boolean isFromXMPP() {
-        return fromXMPP;
-    }
-
-    public String getXmppContact() {
-        return xmppContact;
-    }
-
-    public Date getDate() {
-        return date;
     }
 }

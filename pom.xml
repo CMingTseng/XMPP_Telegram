@@ -25,6 +25,8 @@
 
         <spring.version>5.0.4.RELEASE</spring.version>
 
+        <lombok.version>1.18.2</lombok.version>
+
         <!--MySQL-->
         <mysql.version>8.0.8-dmr</mysql.version>
 
@@ -33,7 +35,7 @@
         <slf4j.version>1.7.25</slf4j.version>
 
         <!--XMPP-->
-        <smack.version>4.2.3</smack.version>
+        <smack.version>4.3.0</smack.version>
 
         <!--Telegram-->
         <telegram.version>3.6</telegram.version>
@@ -92,6 +94,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!--Lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--Logging with SLF4J & LogBack-->
@@ -193,6 +203,34 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>production</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!--DataBase-->
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>${mysql.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>develop</id>
+            <!--DataBase-->
+            <dependencies>
+                <dependency>
+                    <groupId>org.hsqldb</groupId>
+                    <artifactId>hsqldb</artifactId>
+                    <version>2.4.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>

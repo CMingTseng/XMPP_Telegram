@@ -1,10 +1,13 @@
 package xmpptelegram.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-
+@Data
 public class TransferMessage {
 
     private String text;
@@ -16,53 +19,24 @@ public class TransferMessage {
     private Date date;
 
     public TransferMessage() {
-    }
-
-    public TransferMessage(ChatMap map, String text, boolean fromXMPP) {
-        this.chatMap=map;
-        this.text=text;
-        this.fromXMPP=fromXMPP;
-    }
-
-    public ChatMap getChatMap() {
-        return chatMap;
-    }
-
-    public void setChatMap(ChatMap chatMap) {
-        this.chatMap = chatMap;
-    }
-
-    public String getText() {
-        return text;
+        date = new Date();
     }
 
     public void setText(String text) {
+        if (text.length() > 4096) { //передача через телеграм сообщений длиннее невозможна
+            this.text = text.substring(0, 4095);
+        } else {
+            this.text = text;
+        }
+    }
+
+    public TransferMessage(ChatMap map, String text, boolean fromXMPP) {
+        this.chatMap = map;
+        if (text.length() > 4096) {
+            text = text.substring(0, 4095);
+        }
         this.text = text;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public boolean isFromXMPP() {
-        return fromXMPP;
-    }
-
-    public void setFromXMPP(boolean fromXMPP) {
         this.fromXMPP = fromXMPP;
-    }
-
-    @Override
-    public String toString() {
-        return "TransferMessage{" +
-                "text='" + text + '\'' +
-                ", chatMap=" + chatMap +
-                ", fromXMPP=" + fromXMPP +
-                ", date=" + date +
-                '}';
+        date = new Date();
     }
 }

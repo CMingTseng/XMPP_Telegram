@@ -1,23 +1,19 @@
 package xmpptelegram.service;
 
-import org.slf4j.LoggerFactory;
-import xmpptelegram.model.TelegramUser;
-import xmpptelegram.repository.TelegramUserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xmpptelegram.model.TelegramUser;
+import xmpptelegram.repository.jpa.TelegramUserRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class TelegramUserService {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TelegramUserService.class);
-
-    private final TelegramUserRepository repository;
 
     @Autowired
-    public TelegramUserService(TelegramUserRepository repository) {
-        this.repository = repository;
-    }
+    private TelegramUserRepository repository;
 
     public boolean create(int id, String name) {
         if (getById(id) == null) {
@@ -31,12 +27,12 @@ public class TelegramUserService {
     }
 
     public TelegramUser update(TelegramUser user) {
-            try {
-                repository.update(user);
-                return repository.getById(user.getId());
-            } catch (Exception e) {
-                return null;
-            }
+        try {
+            repository.update(user);
+            return repository.getById(user.getId());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean delete(int id) {

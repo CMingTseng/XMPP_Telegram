@@ -1,18 +1,18 @@
 package xmpptelegram.service;
 
-import xmpptelegram.bot.XMPPBot;
-import xmpptelegram.model.TelegramUser;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.objects.Update;
+import xmpptelegram.bot.XMPPBot;
+import xmpptelegram.model.TelegramUser;
 import xmpptelegram.model.XMPPAccount;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class TelegramCommandService {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TelegramCommandService.class);
 
     @Autowired
     private TelegramUserService telegramUserService;
@@ -31,36 +31,38 @@ public class TelegramCommandService {
         String[] args = update.getMessage().getText().split(" ");
         switch (command) {
             case "/help": {
-                LOGGER.info("Command /help invoked");
+                log.info("Command /help invoked");
                 return help();
             }
             case "/start": {
-                LOGGER.info("Command /start invoked");
+                log.info("Command /start invoked");
                 if ((long) update.getMessage().getFrom().getId() == update.getMessage().getChatId()) {
                     return start(update.getMessage().getFrom().getId(), update.getMessage().getFrom().getUserName());
                 } else return "Команда не распознана";
             }
             case "/default": {
-                LOGGER.info("Command /default invoked");
+                log.info("Command /default invoked");
                 return defaultChat(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/addaccount": {
-                LOGGER.info("Command /addaccount invoked");
+                log.info("Command /addaccount invoked");
                 try {
                     if (args.length == 3)
                         return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
                     else if (args.length == 4)
-                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3]);
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2],
+                                args[3]);
                     else if (args.length == 5)
-                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3], Integer.parseInt(args[4]));
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2],
+                                args[3], Integer.parseInt(args[4]));
                     else return "Команда не распознана";
                 } catch (Exception e) {
-                    LOGGER.warn(String.format("Аргументы команды /addaccount не распознаны! Команда: %s", update.getMessage().getText()), e);
+                    log.warn(String.format("Аргументы команды /addaccount не распознаны! Команда: %s", update.getMessage().getText()), e);
                     return "Команда не распознана";
                 }
             }
             case "/addgroup": {
-                LOGGER.info("Command /addgroup invoked");
+                log.info("Command /addgroup invoked");
                 try {
                     if (args.length == 3) {
                         String server = args[1].split("@")[1];
@@ -68,41 +70,42 @@ public class TelegramCommandService {
                         return addGroup(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), server, login, args[2]);
                     } else return "Команда не распознана!";
                 } catch (Exception e) {
-                    LOGGER.warn("Аргументы команды /addgroup не распознаны!", e);
+                    log.warn("Аргументы команды /addgroup не распознаны!", e);
                     return "Команда не распознана!";
                 }
             }
             case "/deleteme": {
-                LOGGER.info("Command /deleteme invoked");
+                log.info("Command /deleteme invoked");
                 if ((long) update.getMessage().getFrom().getId() == update.getMessage().getChatId()) {
                     return deleteTelegramAccount(update.getMessage().getFrom().getId());
                 } else return "Команда не распознана!";
             }
             case "/deletegroup": {
-                LOGGER.info("Command /deletegroup invoked");
+                log.info("Command /deletegroup invoked");
                 return deleteGroup(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/status": {
-                LOGGER.info("Command /status invoked");
+                log.info("Command /status invoked");
                 return status(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             case "/update": {
-                LOGGER.info("Command /update invoked");
+                log.info("Command /update invoked");
                 try {
                     if (args.length == 3) {
                         return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
                     } else if (args.length == 4) {
                         return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3]);
                     } else if (args.length == 5) {
-                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3], Integer.parseInt(args[4]));
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3],
+                                Integer.parseInt(args[4]));
                     } else return "Команда не распознана";
                 } catch (Exception e) {
-                    LOGGER.warn("Аргументы команды /update не распознаны!", e);
+                    log.warn("Аргументы команды /update не распознаны!", e);
                     return "Команда не распознана!";
                 }
             }
             case "/reconnect": {
-                LOGGER.info("Command /reconnect invoked");
+                log.info("Command /reconnect invoked");
                 return reconnect(update.getMessage().getFrom().getId(), update.getMessage().getChatId());
             }
             default:
@@ -121,7 +124,8 @@ public class TelegramCommandService {
                 "/update [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
                 "/update [XMPP-server] [XMPP-account] [password] - обновление данных XMPP-аккаунта\n" +
                 "/update [XMPP-server] [XMPP-account] [password] [port] - обновление данных XMPP-аккаунта\n" +
-                "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только в групповых чатах)\n" +
+                "/addGroup [XMPP-account] [XMPP-contact] - переадресация в текущую группу сообщений данного XMPP-contact (работает только" +
+                " в групповых чатах)\n" +
                 "/deleteGroup - отключение переадресации в текущую группу\n" +
                 "/deleteMe - отключение от бота\n";
     }
@@ -227,7 +231,8 @@ public class TelegramCommandService {
             List<XMPPAccount> accounts = xmppAccountService.getAllByUser(telegramUserService.getById(userId));
             StringBuilder result = new StringBuilder();
             for (XMPPAccount account : accounts) {
-                result.append(String.format("Аккаунт %s: %s\n", account.getLogin() + "@" + account.getServer(), xmppBot.checkStatus(account)));
+                result.append(String.format("Аккаунт %s: %s\n", account.getLogin() + "@" + account.getServer(),
+                        xmppBot.checkStatus(account)));
             }
             return result.toString();
         }
@@ -269,16 +274,13 @@ public class TelegramCommandService {
             List<XMPPAccount> accounts = xmppAccountService.getAllByUser(telegramUserService.getById(userId));
             if (accounts == null) {
                 return "Нет доступных XMPP-аккаунтов";
-            }else {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (XMPPAccount account : accounts) {
-                            xmppBot.disconnectAccount(account);
-                            xmppBot.connectAccount(account);
-                        }
+            } else {
+                XMPPBot.threadPool.execute(() -> {
+                    for (XMPPAccount account : accounts) {
+                        xmppBot.disconnectAccount(account);
+                        xmppBot.connectAccount(account);
                     }
-                }).start();
+                });
                 return "Команда выполнена успешно";
             }
 

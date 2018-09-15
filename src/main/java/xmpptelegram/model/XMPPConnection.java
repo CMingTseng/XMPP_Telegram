@@ -116,6 +116,13 @@ public class XMPPConnection {
                     @Override
                     public void connectionClosedOnError(Exception e) {
                         super.connectionClosedOnError(e);
+                        XMPPBot.threadPool.execute(() -> controller.getMessageService().send(server, login,
+                                null, String.format("Не удается подключиться к серверу! Аккаунт %s@%s: %s", login, server, getStatus())));
+                    }
+
+                    @Override
+                    public void connectionClosed() {
+                        super.connectionClosed();
                         sendStatus();
                     }
                 });
@@ -132,7 +139,6 @@ public class XMPPConnection {
         if (connection != null && connection.isConnected()) {
             connection.disconnect();
         }
-        sendStatus();
     }
 
     public boolean sendMessage(TransferMessage transferMessage) {

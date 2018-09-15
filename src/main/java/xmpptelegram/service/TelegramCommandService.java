@@ -265,7 +265,11 @@ public class TelegramCommandService {
             account.setPort(port);
             if (xmppAccountService.update(account) == null) {
                 return "Ошибка обновления аккаунта!";
-            } else return "Данные успешно обновлены";
+            } else {
+                xmppBot.disconnectAccount(account);
+                xmppBot.connectAccount(account);
+                return "Данные успешно обновлены";
+            }
         }
     }
 

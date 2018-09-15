@@ -129,6 +129,8 @@ public class XMPPConnection {
                 sendStatus();
             } catch (Exception e) {
                 closeConnection();
+                XMPPBot.threadPool.execute(() -> controller.getMessageService().send(server, login,
+                        null, String.format("Не удается подключиться к серверу! Аккаунт %s@%s: %s", login, server, getStatus())));
                 log.error(String.format("Error connection XMPPAccount. Server: %s login: %s", server, login), e);
             }
         }

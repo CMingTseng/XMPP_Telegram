@@ -129,6 +129,9 @@ public class MessageService {
         } else {
             if (update.getMessage().getChatId().equals((long) update.getMessage().getFrom().getId()) || message.getChatMap() == null) {
                 message.setText("Неверный чат! Сообщение не будет доставлено - нет получателя!");
+                ChatMap map = new ChatMap();
+                map.setChatId(update.getMessage().getChatId());
+                message.setChatMap(map);
                 send(message, true);
                 log.warn("Incorrect chat. ", update.toString());
                 return;

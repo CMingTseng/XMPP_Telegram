@@ -208,7 +208,7 @@
         <profile>
             <id>production</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <!--DataBase-->
             <dependencies>
@@ -221,6 +221,9 @@
         </profile>
         <profile>
             <id>develop</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <!--DataBase-->
             <dependencies>
                 <dependency>

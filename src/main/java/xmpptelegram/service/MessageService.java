@@ -76,6 +76,7 @@ public class MessageService {
         }
         if (transferMessage.isFromXMPP()) {
             SendMessage message = new SendMessage();
+            log.error(transferMessage.toString());
             message.setChatId(transferMessage.getChatMap().getChatId());
             message.setText(transferMessage.getText());
             try {

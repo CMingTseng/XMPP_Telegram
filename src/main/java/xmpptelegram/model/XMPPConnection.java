@@ -115,9 +115,9 @@ public class XMPPConnection {
                 connection.addConnectionListener(new AbstractConnectionListener() {
                     @Override
                     public void connectionClosedOnError(Exception e) {
-                        super.connectionClosedOnError(e);
                         XMPPBot.threadPool.execute(() -> controller.getMessageService().send(server, login,
                                 null, String.format("Не удается подключиться к серверу! Аккаунт %s@%s: %s", login, server, getStatus())));
+                        super.connectionClosedOnError(e);
                     }
 
                     @Override

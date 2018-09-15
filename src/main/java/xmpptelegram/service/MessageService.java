@@ -76,7 +76,6 @@ public class MessageService {
         }
         if (transferMessage.isFromXMPP()) {
             SendMessage message = new SendMessage();
-            log.error(transferMessage.toString());
             message.setChatId(transferMessage.getChatMap().getChatId());
             message.setText(transferMessage.getText());
             try {
@@ -120,6 +119,11 @@ public class MessageService {
         message.setChatMap(chatMapService.getByChatId(update.getMessage().getChatId()));
         message.setFromXMPP(false);
         if (update.getMessage().getText().matches("^[/].+")) {
+            if (message.getChatMap() == null) {
+                ChatMap map = new ChatMap();
+                map.setChatId(update.getMessage().getChatId());
+                message.setChatMap(map);
+            }
             message.setText(telegramCommandService.useCommand(update));
             send(message, true);
         } else {

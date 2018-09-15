@@ -143,8 +143,11 @@ public class XMPPConnection {
 
     public boolean sendMessage(TransferMessage transferMessage) {
         try {
-            ChatManager.getInstanceFor(connection)
-                       .chatWith(JidCreate.entityBareFrom(transferMessage.getChatMap().getXmppContact())).send(transferMessage.getText());
+            Chat chat = ChatManager.getInstanceFor(connection)
+                                   .chatWith(JidCreate.entityBareFrom(transferMessage.getChatMap().getXmppContact()));
+            log.info("-----------------------");
+            log.info(chat.toString());
+            chat.send(transferMessage.getText());
             return true;
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             log.warn("Can't send message to XMPP! " + transferMessage.toString());

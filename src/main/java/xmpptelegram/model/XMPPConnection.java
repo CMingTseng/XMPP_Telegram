@@ -123,7 +123,7 @@ public class XMPPConnection {
                     @Override
                     public void connectionClosed() {
                         super.connectionClosed();
-                        sendStatus();
+//                        sendStatus();
                     }
                 });
             } catch (Exception e) {

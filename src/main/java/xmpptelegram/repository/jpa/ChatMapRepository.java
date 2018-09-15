@@ -30,7 +30,7 @@ public class ChatMapRepository {
                                 .setParameter("xmppContact", contact)
                                 .getSingleResult();
         } catch (NoResultException e) {
-            log.warn(String.format("Empty chatmap data for XMPPAccount: %s, contact: %s", account.getLogin() + "@" + account.getServer(),
+            log.debug(String.format("Empty chatmap data for XMPPAccount: %s, contact: %s", account.getLogin() + "@" + account.getServer(),
                     contact));
             return null;
         }

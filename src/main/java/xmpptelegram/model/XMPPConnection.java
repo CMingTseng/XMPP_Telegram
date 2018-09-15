@@ -55,7 +55,7 @@ public class XMPPConnection {
     }
 
     private void configure() throws Exception { //собираем настройки и проверяем их на корректность. Пробрасываем исключение, если возникнет
-        SmackConfiguration.DEBUG = true; //Включает режим отладки XMPP сообщений
+//        SmackConfiguration.DEBUG = true; //Включает режим отладки XMPP сообщений
         configuration = XMPPTCPConnectionConfiguration.builder()
                                                       .setXmppDomain(JidCreate.domainBareFrom(server))
                                                       .setPort(port)
@@ -106,7 +106,6 @@ public class XMPPConnection {
                 configure();
                 connect();
                 login();
-                sendStatus();
                 ChatManager.getInstanceFor(connection).addIncomingListener((EntityBareJid from, Message message, Chat chat) -> {
                     if (message.getType().equals(Message.Type.chat) && message.getBody() != null) {
                         XMPPBot.threadPool.execute(() -> controller.getMessageService().send(server, login,
@@ -119,13 +118,8 @@ public class XMPPConnection {
                         super.connectionClosedOnError(e);
                         sendStatus();
                     }
-
-                    @Override
-                    public void connectionClosed() {
-                        super.connectionClosed();
-//                        sendStatus();
-                    }
                 });
+                sendStatus();
             } catch (Exception e) {
                 closeConnection();
                 log.error(String.format("Error connection XMPPAccount. Server: %s login: %s", server, login), e);
@@ -143,11 +137,8 @@ public class XMPPConnection {
 
     public boolean sendMessage(TransferMessage transferMessage) {
         try {
-            Chat chat = ChatManager.getInstanceFor(connection)
-                                   .chatWith(JidCreate.entityBareFrom(transferMessage.getChatMap().getXmppContact()));
-            log.info("-----------------------");
-            log.info(chat.toString());
-            chat.send(transferMessage.getText());
+            ChatManager.getInstanceFor(connection)
+                       .chatWith(JidCreate.entityBareFrom(transferMessage.getChatMap().getXmppContact())).send(transferMessage.getText());
             return true;
         } catch (SmackException.NotConnectedException | InterruptedException | XmppStringprepException e) {
             log.warn("Can't send message to XMPP! " + transferMessage.toString());
@@ -157,10 +148,6 @@ public class XMPPConnection {
 
     public boolean isConnected() {
         return connection != null && connection.isConnected();
-    }
-
-    public boolean equalsByXMPPAccount(XMPPAccount account) {
-        return login.equals(account.getLogin()) && server.equals(account.getServer());
     }
 
     private class SSLSetting {

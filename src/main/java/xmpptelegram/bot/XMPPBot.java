@@ -34,6 +34,8 @@ public class XMPPBot {
 
     public static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
+    public final ConcurrentMap<XMPPAccount, Boolean> lastStatues = new ConcurrentHashMap<>();
+
     @Autowired
     private XMPPAccountService accountService;
 
@@ -55,6 +57,7 @@ public class XMPPBot {
 
     public void stop() {
         connections.forEach((XMPPAccount k, XMPPConnection v) -> connections.remove(k).closeConnection());
+        lastStatues.forEach((XMPPAccount k, Boolean v) -> lastStatues.remove(k));
     }
 
 
@@ -65,14 +68,6 @@ public class XMPPBot {
     public void connectAccount(XMPPAccount account) {
         connections.put(account, new XMPPConnection(account, this).createConnection());
     }
-//
-//    //Сообщения из XMPP в Telegram
-//    public void receiveXMPPMessage(String server, String login, String contact, String text) {
-//
-//        XMPPAccount account = accountService.get(server, login);
-//        messageService.messageFromXMPP(account, contact, text);
-//
-//    }
 
     //Сообщения из Telegram в XMPP
     public boolean sendXMPPMessage(TransferMessage transferMessage) {

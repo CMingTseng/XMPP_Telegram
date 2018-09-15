@@ -48,13 +48,15 @@ public class TelegramCommandService {
                 log.info("Command /addaccount invoked");
                 try {
                     if (args.length == 3)
-                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2]);
                     else if (args.length == 4)
-                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2],
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2].toLowerCase(),
                                 args[3]);
                     else if (args.length == 5)
-                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2],
-                                args[3], Integer.parseInt(args[4]));
+                        return addAccount(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2].toLowerCase(), args[3], Integer.parseInt(args[4]));
                     else return "Команда не распознана";
                 } catch (Exception e) {
                     log.warn(String.format("Аргументы команды /addaccount не распознаны! Команда: %s", update.getMessage().getText()), e);
@@ -65,8 +67,8 @@ public class TelegramCommandService {
                 log.info("Command /addgroup invoked");
                 try {
                     if (args.length == 3) {
-                        String server = args[1].split("@")[1];
-                        String login = args[1].split("@")[0];
+                        String server = args[1].split("@")[1].toLowerCase();
+                        String login = args[1].split("@")[0].toLowerCase();
                         return addGroup(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), server, login, args[2]);
                     } else return "Команда не распознана!";
                 } catch (Exception e) {
@@ -92,12 +94,14 @@ public class TelegramCommandService {
                 log.info("Command /update invoked");
                 try {
                     if (args.length == 3) {
-                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2]);
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2]);
                     } else if (args.length == 4) {
-                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3]);
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2].toLowerCase(), args[3]);
                     } else if (args.length == 5) {
-                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1], args[2], args[3],
-                                Integer.parseInt(args[4]));
+                        return update(update.getMessage().getFrom().getId(), update.getMessage().getChatId(), args[1].toLowerCase(),
+                                args[2].toLowerCase(), args[3], Integer.parseInt(args[4]));
                     } else return "Команда не распознана";
                 } catch (Exception e) {
                     log.warn("Аргументы команды /update не распознаны!", e);

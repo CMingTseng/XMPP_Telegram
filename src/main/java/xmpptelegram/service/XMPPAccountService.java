@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xmpptelegram.model.TelegramUser;
 import xmpptelegram.model.XMPPAccount;
-import xmpptelegram.model.XMPPConnection;
 import xmpptelegram.repository.jpa.XMPPAccountRepository;
 
 import java.util.ArrayList;
@@ -21,16 +20,6 @@ public class XMPPAccountService {
     public List<XMPPAccount> getAll() {
         return repository.getAll();
     }
-
-//    public List<XMPPConnection> getAllConnections() {
-//        List<XMPPAccount> list = repository.getAll();
-//        List<XMPPConnection> result = new ArrayList<>();
-//        for (XMPPAccount account : list) {
-//            if (account.isActive())
-//                result.add(new XMPPConnection(account));
-//        }
-//        return result;
-//    }
 
     public XMPPAccount get(String server, String login) {
         return repository.get(server, login);

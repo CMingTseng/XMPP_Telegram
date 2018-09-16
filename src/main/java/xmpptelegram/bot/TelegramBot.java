@@ -31,7 +31,6 @@ import org.telegram.telegrambots.generics.WebhookBot;
 import xmpptelegram.config.TelegramConfig;
 import xmpptelegram.service.MessageService;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -95,55 +94,9 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
 
     @Override
     public void setWebhook(String url, String publicCertificatePath) throws TelegramApiRequestException {
-//        log.debug("Try to setWebHook with URL " + url);
-//        try (CloseableHttpClient httpclient = HttpClientBuilder.create().setSSLHostnameVerifier(new NoopHostnameVerifier()).build()) {
-//            String requestUrl = getBaseUrl() + SetWebhook.PATH;
-//            HttpPost httppost = new HttpPost(requestUrl);
-//            httppost.setConfig(botOptions.getRequestConfig());
-//            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-//            builder.addTextBody(SetWebhook.URL_FIELD, url);
-//            if (botOptions.getMaxWebhookConnections() != null) {
-//                builder.addTextBody(SetWebhook.MAXCONNECTIONS_FIELD, botOptions.getMaxWebhookConnections().toString());
-//            }
-//            if (botOptions.getAllowedUpdates() != null) {
-//                builder.addTextBody(SetWebhook.ALLOWEDUPDATES_FIELD, new JSONArray(botOptions.getMaxWebhookConnections()).toString());
-//            }
-//            if (publicCertificatePath != null) {
-//                File certificate = Files.createTempFile("temp_", ".pem").toFile();
-//                certificate.deleteOnExit();
-//                try (InputStream in = loader.getResource(publicCertificatePath).getInputStream();
-//                     OutputStream out = new FileOutputStream(certificate)) {
-//                    IOUtils.copy(in, out);
-//                    if (certificate.exists()) {
-//                        log.info("Upload webHook certificate");
-//                        builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
-//                        builder.addTextBody("has_custom_certificate", "true");
-//                    }
-//                }
-//            }
-//            HttpEntity multipart = builder.build();
-//            log.debug("setWebHook HTTP body\n" + multipart.toString());
-//            httppost.setEntity(multipart);
-//            try (CloseableHttpResponse response = httpclient.execute(httppost)) {
-//                HttpEntity ht = response.getEntity();
-//                BufferedHttpEntity buf = new BufferedHttpEntity(ht);
-//                String responseContent = EntityUtils.toString(buf, StandardCharsets.UTF_8);
-//                JSONObject jsonObject = new JSONObject(responseContent);
-//                if (!jsonObject.getBoolean(ApiConstants.RESPONSE_FIELD_OK)) {
-//                    throw new TelegramApiRequestException("Error setting webhook", jsonObject);
-//                } else {
-//                    log.info("WebHook has set success");
-//                }
-//            }
-//        } catch (JSONException e) {
-//            throw new TelegramApiRequestException("Error deserializing setWebhook method response", e);
-//        } catch (IOException e) {
-//            throw new TelegramApiRequestException("Error executing setWebook method", e);
-//        }
-
+        log.debug("Try to setWebHook with URL " + url);
         try (CloseableHttpClient httpclient = HttpClientBuilder.create().setSSLHostnameVerifier(new NoopHostnameVerifier()).build()) {
             String requestUrl = getBaseUrl() + SetWebhook.PATH;
-
             HttpPost httppost = new HttpPost(requestUrl);
             httppost.setConfig(botOptions.getRequestConfig());
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -155,12 +108,20 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
                 builder.addTextBody(SetWebhook.ALLOWEDUPDATES_FIELD, new JSONArray(botOptions.getMaxWebhookConnections()).toString());
             }
             if (publicCertificatePath != null) {
-                File certificate = new File(publicCertificatePath);
-                if (certificate.exists()) {
-                    builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
+                File certificate = Files.createTempFile("temp_", ".pem").toFile();
+                certificate.deleteOnExit();
+                try (InputStream in = loader.getResource(publicCertificatePath).getInputStream();
+                     OutputStream out = new FileOutputStream(certificate)) {
+                    IOUtils.copy(in, out);
+                    if (certificate.exists()) {
+                        log.info("Upload webHook certificate");
+                        builder.addBinaryBody(SetWebhook.CERTIFICATE_FIELD, certificate, ContentType.TEXT_PLAIN, certificate.getName());
+                        builder.addTextBody("has_custom_certificate", "true");
+                    }
                 }
             }
             HttpEntity multipart = builder.build();
+            log.debug("setWebHook HTTP body\n" + multipart.toString());
             httppost.setEntity(multipart);
             try (CloseableHttpResponse response = httpclient.execute(httppost)) {
                 HttpEntity ht = response.getEntity();
@@ -169,6 +130,8 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
                 JSONObject jsonObject = new JSONObject(responseContent);
                 if (!jsonObject.getBoolean(ApiConstants.RESPONSE_FIELD_OK)) {
                     throw new TelegramApiRequestException("Error setting webhook", jsonObject);
+                } else {
+                    log.info("WebHook has set success");
                 }
             }
         } catch (JSONException e) {
@@ -176,8 +139,6 @@ public class TelegramBot extends DefaultAbsSender implements WebhookBot {
         } catch (IOException e) {
             throw new TelegramApiRequestException("Error executing setWebook method", e);
         }
-
-
     }
 
     public String getCert() {

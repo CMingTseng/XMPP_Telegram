@@ -2,7 +2,10 @@ package xmpptelegram.model;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.AbstractConnectionListener;
+import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.java7.XmppHostnameVerifier;

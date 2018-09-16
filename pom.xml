@@ -5,7 +5,7 @@
 
     <groupId>com.github</groupId>
     <artifactId>xmpp_telegram</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>xmpptelegram</name>

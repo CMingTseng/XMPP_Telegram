@@ -34,8 +34,6 @@ public class XMPPBot {
 
     public static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
-    public final ConcurrentMap<XMPPAccount, Boolean> lastStatues = new ConcurrentHashMap<>();
-
     @Autowired
     private XMPPAccountService accountService;
 
@@ -57,7 +55,6 @@ public class XMPPBot {
 
     public void stop() {
         connections.forEach((XMPPAccount k, XMPPConnection v) -> connections.remove(k).closeConnection());
-        lastStatues.forEach((XMPPAccount k, Boolean v) -> lastStatues.remove(k));
     }
 
 

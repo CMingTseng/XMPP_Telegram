@@ -47,7 +47,6 @@ public class MessageService {
     private void checkUnsentMessages() {
         log.debug("checkUnsentMessages");
         List<UnsentMessage> list = getAll();
-        log.debug(String.valueOf(list.size()));
         for (UnsentMessage message : list) {
             ChatMap map = chatMapService.getByAccountAndContact(message.getXmppAccount(), message.getXmppContact());
             if (map != null) {
